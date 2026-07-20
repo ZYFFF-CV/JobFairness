@@ -66,6 +66,12 @@ to `run_fuxictr_model.py` so FuxiCTR checkpoints and its file logs do not land
 inside the source checkout. Do not modify sibling repositories under
 `/root/autodl-tmp/code`.
 
+The server uses Python 3.12 from the shared Conda base through a project venv.
+Install `configs/fairjob/requirements-server.txt` in that venv. It pins
+scikit-learn 1.4.2 because FuxiCTR 2.3.9 still passes the deprecated `eps`
+argument to `sklearn.metrics.log_loss`; scikit-learn 1.5 and newer reject it.
+XGBoost is pinned to 2.1.4 to match the locally validated baseline version.
+
 ## 3. Implemented Files
 
 New FairJob code is under:
