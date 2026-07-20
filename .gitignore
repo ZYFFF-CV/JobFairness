@@ -106,3 +106,8 @@ venv.bak/
 _build
 checkpoints
 *.csv
+codex-related/
+data/FairJob/raw/
+data/FairJob/processed/
+data/FairJob/fuxictr/
+results/fairjob/

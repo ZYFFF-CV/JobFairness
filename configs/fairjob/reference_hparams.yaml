@@ -1,0 +1,20 @@
+LR:
+  fallback_reference:
+    learning_rate: 1.0e-3
+    regularizer: 1.0e-6
+    batch_size_smoke: 1024
+    batch_size_full: 4096
+    epochs_smoke: 1
+    epochs_full: 5
+XGB:
+  fallback_reference:
+    max_depth: 6
+    min_child_weight: 1.0
+    subsample: 0.8
+    learning_rate: 0.05
+    colsample_bytree: 0.8
+    reg_lambda: 1.0
+    gamma: 0.1
+    n_estimators: 100
+    tree_method: hist
+    random_state: 2019

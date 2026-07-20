@@ -1,0 +1,7 @@
+# FuxiCTR loads configs/fairjob/model_config.yaml. This file mirrors the
+# FairJob LR experiment ids for task-card traceability.
+LR_experiment_ids:
+  - LR_fairjob_unaware_smoke
+  - LR_fairjob_unfair_smoke
+  - LR_fairjob_unaware_full
+  - LR_fairjob_unfair_full
