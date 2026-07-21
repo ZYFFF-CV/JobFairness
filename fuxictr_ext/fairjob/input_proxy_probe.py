@@ -25,6 +25,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from fuxictr_ext.fairjob.prepare_probe_samples import load_probe_row_ids
+from fuxictr_ext.fairjob.proxy_probe import fit_probe
 from fuxictr_ext.fairjob.protocols import features_for_protocol, load_protocols
 from fuxictr_ext.fairjob.run_manifest import git_commit, write_run_manifest
 
@@ -51,6 +52,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--protocol", default="pre_ranking")
     parser.add_argument("--regime", default="proxy_excluded")
     parser.add_argument("--feature_set", choices=FEATURE_SETS, default="all_model_inputs")
+    parser.add_argument("--probe_type", choices=["linear", "nonlinear"], default="linear")
     parser.add_argument("--probe_sample", required=True)
     parser.add_argument("--seed", type=int, default=2019)
     parser.add_argument("--out", required=True)
@@ -157,9 +159,27 @@ def encode_inputs(
 
 
 def fit_input_probe(
-    encoded: dict[str, np.ndarray], targets: dict[str, np.ndarray], seed: int
+    encoded: dict[str, np.ndarray],
+    targets: dict[str, np.ndarray],
+    seed: int,
+    probe_type: str = "linear",
 ) -> dict:
-    """Select logistic C on validation AUC and evaluate the test split once."""
+    """Select matched probe capacity on validation and report test once."""
+
+    if probe_type == "nonlinear":
+        # Reuse the exact hidden-representation MLP grid so amplification is not
+        # an artifact of comparing a nonlinear layer probe with a linear input
+        # baseline. Target encoding remains fit on train only in both cases.
+        return fit_probe(
+            encoded["train"],
+            targets["train"],
+            encoded["valid"],
+            targets["valid"],
+            encoded["test"],
+            targets["test"],
+            probe_type="nonlinear",
+            seed=seed,
+        )[0]
 
     best = None
     for c_value in (0.1, 1.0, 10.0):
@@ -214,7 +234,7 @@ def main() -> None:
     encoded, encoding_metadata = encode_inputs(
         frames, targets, categorical, numeric, args.seed
     )
-    probe = fit_input_probe(encoded, targets, args.seed)
+    probe = fit_input_probe(encoded, targets, args.seed, probe_type=args.probe_type)
     payload = {
         "git_commit": git_commit(PROJECT_ROOT),
         "data_dir": str(data_dir),
@@ -224,6 +244,7 @@ def main() -> None:
         "features": features,
         "probe_sample": args.probe_sample,
         "seed": args.seed,
+        "probe_type": args.probe_type,
         "n_probe_train": int(len(targets["train"])),
         "n_probe_valid": int(len(targets["valid"])),
         "n_probe_test": int(len(targets["test"])),

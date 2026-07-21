@@ -35,3 +35,18 @@ def test_train_only_target_encoding_handles_unseen_test_category():
     assert np.isfinite(encoded["test"]).all()
     result = fit_input_probe(encoded, targets, seed=7)
     assert 0.5 <= result["test_auc"] <= 1.0
+
+
+def test_nonlinear_input_probe_uses_representation_probe_family():
+    rng = np.random.default_rng(9)
+    encoded = {
+        split: rng.normal(size=(80, 3)).astype(np.float32)
+        for split in ("train", "valid", "test")
+    }
+    targets = {
+        split: (values[:, 0] > 0).astype(np.int8)
+        for split, values in encoded.items()
+    }
+    result = fit_input_probe(encoded, targets, seed=9, probe_type="nonlinear")
+    assert result["family"] == "nonlinear"
+    assert result["test_auc"] > 0.9

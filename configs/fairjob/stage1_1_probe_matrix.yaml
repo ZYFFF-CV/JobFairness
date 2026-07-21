@@ -37,6 +37,11 @@ input_jobs:
     group: positive_control
     regime: proxy_included
     feature_set: all_model_inputs
+  - name: raw_proxy_excluded_no_user_id_nonlinear
+    group: identity_nonlinear_screening
+    regime: proxy_excluded
+    feature_set: no_user_id
+    probe_type: nonlinear
 
 representation_jobs:
   - name: deepfm_proxy_excluded
@@ -121,19 +126,19 @@ representation_jobs:
       - parallel_dnn_linear_1
       - dcnv2_final
       - dcnv2_logit
-  - name: deepfm_no_user_id_nonlinear
+  - name: deepfm_no_user_id_matched_nonlinear
     group: identity_nonlinear_screening
     root: deepfm_no_user_id
-    input_baseline: raw_proxy_excluded_no_user_id
+    input_baseline: raw_proxy_excluded_no_user_id_nonlinear
     probe_type: nonlinear
     representations:
       - embedding_flat
       - dnn_linear_0
       - dnn_linear_3
-  - name: dcnv2_no_user_id_nonlinear
+  - name: dcnv2_no_user_id_matched_nonlinear
     group: identity_nonlinear_screening
     root: dcnv2_no_user_id
-    input_baseline: raw_proxy_excluded_no_user_id
+    input_baseline: raw_proxy_excluded_no_user_id_nonlinear
     probe_type: nonlinear
     representations:
       - embedding_flat

@@ -104,6 +104,8 @@ def input_commands(matrix: dict, group: str) -> list[tuple[str, list[str], Path]
             job["regime"],
             "--feature_set",
             job["feature_set"],
+            "--probe_type",
+            job.get("probe_type", "linear"),
             "--probe_sample",
             str(sample_path),
             "--seed",
