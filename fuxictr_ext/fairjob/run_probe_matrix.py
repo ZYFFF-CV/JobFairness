@@ -33,6 +33,8 @@ def parse_args() -> argparse.Namespace:
             "input_controls",
             "layer_screening",
             "nonlinear_screening",
+            "identity_layer_screening",
+            "identity_nonlinear_screening",
             "positive_control",
         ],
     )
@@ -155,18 +157,40 @@ def commands_for_group(matrix: dict, group: str) -> list[tuple[str, list[str], P
     """Return commands in dependency order for the requested probe group."""
 
     commands = input_commands(matrix, group)
-    if group in {"layer_screening", "nonlinear_screening", "positive_control"}:
+    if group in {
+        "layer_screening",
+        "nonlinear_screening",
+        "identity_layer_screening",
+        "identity_nonlinear_screening",
+        "positive_control",
+    }:
         commands.extend(layer_commands(matrix, group))
     if not commands:
         raise ValueError(f"No probe jobs found for group {group!r}.")
     return commands
 
 
+def probe_sample_is_current(matrix: dict, output: Path) -> bool:
+    """Check that a frozen sample covers the matrix's exact export roots."""
+
+    manifest_path = output.with_suffix(".json")
+    if not output.exists() or not manifest_path.exists():
+        return False
+    _, _, roots = resolve_layout(matrix)
+    metadata = json.loads(manifest_path.read_text(encoding="utf-8"))
+    return (
+        metadata.get("representation_roots")
+        == [str(root) for root in roots.values()]
+        and metadata.get("max_rows_per_split") == matrix["max_rows_per_split"]
+        and metadata.get("seed") == matrix["seed"]
+    )
+
+
 def ensure_probe_sample(matrix: dict, mode: str, resume: bool) -> None:
     """Create the shared sample before any probe consumes it."""
 
     command, output = sample_command(matrix)
-    if output.exists() and resume:
+    if resume and probe_sample_is_current(matrix, output):
         return
     if mode == "print":
         print(json.dumps(command))

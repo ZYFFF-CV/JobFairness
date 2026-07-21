@@ -9,6 +9,8 @@ representation_roots:
   deepfm_proxy_included: training/deepfm_pre_ranking_proxy_included/representations
   dcnv2_proxy_excluded: training/dcnv2_pre_ranking_proxy_excluded/representations
   dcnv2_proxy_included: training/dcnv2_pre_ranking_proxy_included/representations
+  deepfm_no_user_id: training/deepfm_pre_ranking_no_user_id/representations
+  dcnv2_no_user_id: training/dcnv2_pre_ranking_no_user_id/representations
 
 input_jobs:
   - name: raw_proxy_excluded_all
@@ -89,6 +91,49 @@ representation_jobs:
     group: nonlinear_screening
     root: dcnv2_proxy_excluded
     input_baseline: raw_proxy_excluded_all
+    probe_type: nonlinear
+    representations:
+      - embedding_flat
+      - cross_layer_0
+      - dcnv2_final
+  - name: deepfm_no_user_id
+    group: identity_layer_screening
+    root: deepfm_no_user_id
+    input_baseline: raw_proxy_excluded_no_user_id
+    representations:
+      - embedding_flat
+      - fm_logit
+      - dnn_linear_0
+      - dnn_linear_1
+      - dnn_linear_2
+      - dnn_linear_3
+      - deepfm_logit
+  - name: dcnv2_no_user_id
+    group: identity_layer_screening
+    root: dcnv2_no_user_id
+    input_baseline: raw_proxy_excluded_no_user_id
+    representations:
+      - embedding_flat
+      - cross_layer_0
+      - cross_layer_1
+      - cross_layer_2
+      - parallel_dnn_linear_0
+      - parallel_dnn_linear_1
+      - dcnv2_final
+      - dcnv2_logit
+  - name: deepfm_no_user_id_nonlinear
+    group: identity_nonlinear_screening
+    root: deepfm_no_user_id
+    input_baseline: raw_proxy_excluded_no_user_id
+    probe_type: nonlinear
+    representations:
+      - embedding_flat
+      - dnn_linear_0
+      - dnn_linear_3
+  - name: dcnv2_no_user_id_nonlinear
+    group: identity_nonlinear_screening
+    root: dcnv2_no_user_id
+    input_baseline: raw_proxy_excluded_no_user_id
     probe_type: nonlinear
     representations:
       - embedding_flat
