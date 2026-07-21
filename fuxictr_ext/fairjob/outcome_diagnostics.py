@@ -7,6 +7,7 @@ import json
 import sys
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -70,11 +71,16 @@ def build_frame(pred_path: str | Path, meta_path: str | Path) -> tuple[pd.DataFr
     frame["y_true"] = pred["y_true"].to_numpy(dtype=float)
     frame["y_pred"] = pred["y_pred"].to_numpy(dtype=float)
     frame["click"] = frame["click"].to_numpy(dtype=float)
-    labels = {
-        key: pred.iloc[0].get(key)
-        for key in ("model", "regime", "mode", "expid", "protocol", "seed")
-        if key in pred.columns
-    }
+    labels = {}
+    for key in ("model", "regime", "mode", "expid", "protocol", "seed"):
+        if key not in pred.columns:
+            continue
+        value = pred.iloc[0].get(key)
+        if pd.isna(value):
+            value = None
+        elif isinstance(value, np.generic):
+            value = value.item()
+        labels[key] = value
     return frame, {"alignment": alignment, "labels": labels}
 
 

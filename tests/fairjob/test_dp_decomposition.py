@@ -1,3 +1,4 @@
+import json
 import math
 
 import pandas as pd
@@ -21,3 +22,4 @@ def test_dp_decomposition_separates_within_and_composition_terms():
     )
     assert result["common_contexts"] == 2
     assert sum(item["reference_weight"] for item in result["contexts"]) == 1.0
+    json.dumps(result)

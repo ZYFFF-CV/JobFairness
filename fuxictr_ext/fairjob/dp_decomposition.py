@@ -64,7 +64,10 @@ def decompose_dp(
     rows = []
     for key, weight in weights.items():
         key_values = key if isinstance(key, tuple) else (key,)
-        row = {name: value for name, value in zip(context_columns, key_values)}
+        row = {
+            name: value.item() if isinstance(value, np.generic) else value
+            for name, value in zip(context_columns, key_values)
+        }
         row.update(
             {
                 "group_0_n": int(sizes.loc[key, 0]),
