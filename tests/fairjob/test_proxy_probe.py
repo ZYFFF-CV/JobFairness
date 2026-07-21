@@ -23,6 +23,8 @@ def test_probe_selects_on_validation_and_reports_test():
     )
     assert len(result) == 1
     assert result[0]["family"] == "linear"
+    assert result[0]["converged"]
+    assert result[0]["n_iter"] > 0
     assert result[0]["valid_auc"] > 0.95
     assert result[0]["test_auc"] > 0.95
 

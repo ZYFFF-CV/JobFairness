@@ -36,6 +36,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--probe_type", choices=["linear", "nonlinear", "both"], default="both")
     parser.add_argument("--max_rows_per_split", type=int, default=200000)
     parser.add_argument("--seed", type=int, default=2019)
+    parser.add_argument("--linear_max_iter", type=int, default=1000)
     parser.add_argument(
         "--probe_sample",
         default=None,
@@ -138,7 +139,9 @@ def sample_representation(
     return kept_X, kept_y, kept_row_id
 
 
-def candidate_models(probe_type: str, seed: int) -> list[tuple[str, dict, object]]:
+def candidate_models(
+    probe_type: str, seed: int, linear_max_iter: int = 1000
+) -> list[tuple[str, dict, object]]:
     """Return the bounded probe grid used for validation-only selection."""
 
     candidates = []
@@ -150,7 +153,7 @@ def candidate_models(probe_type: str, seed: int) -> list[tuple[str, dict, object
                 LogisticRegression(
                     C=c_value,
                     class_weight="balanced",
-                    max_iter=1000,
+                    max_iter=linear_max_iter,
                     random_state=seed,
                 ),
             )
@@ -182,6 +185,7 @@ def fit_probe(
     y_test: np.ndarray,
     probe_type: str,
     seed: int,
+    linear_max_iter: int = 1000,
 ) -> list[dict]:
     """Select one model per probe family on validation AUC and report test once."""
 
@@ -189,7 +193,9 @@ def fit_probe(
     families = {"linear", "nonlinear"} if probe_type == "both" else {probe_type}
     for family in sorted(families):
         best = None
-        for current_family, params, model in candidate_models(probe_type, seed):
+        for current_family, params, model in candidate_models(
+            probe_type, seed, linear_max_iter=linear_max_iter
+        ):
             if current_family != family:
                 continue
             model.fit(X_train, y_train)
@@ -202,7 +208,12 @@ def fit_probe(
                     "model": model,
                     "valid_auc": valid_auc,
                 }
-        test_prob = best.pop("model").predict_proba(X_test)[:, 1]
+        selected_model = best.pop("model")
+        estimator = selected_model.steps[-1][1]
+        n_iter = int(np.max(np.atleast_1d(estimator.n_iter_)))
+        best["n_iter"] = n_iter
+        best["converged"] = n_iter < estimator.max_iter
+        test_prob = selected_model.predict_proba(X_test)[:, 1]
         best["test_auc"] = float(roc_auc_score(y_test, test_prob))
         best["test_balanced_accuracy"] = float(
             balanced_accuracy_score(y_test, test_prob >= 0.5)
@@ -265,6 +276,7 @@ def main() -> None:
         y_test,
         args.probe_type,
         args.seed,
+        linear_max_iter=args.linear_max_iter,
     )
     for probe in probes:
         add_amplification(probe, input_baseline_auc)
@@ -274,6 +286,7 @@ def main() -> None:
         "representation_root": str(root),
         "representation": args.representation,
         "seed": args.seed,
+        "linear_max_iter": args.linear_max_iter,
         "probe_sample": args.probe_sample,
         "shard_validation": not args.skip_shard_validation,
         "input_baseline_result": args.input_baseline_result,

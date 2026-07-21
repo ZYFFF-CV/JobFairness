@@ -76,3 +76,21 @@ representation_jobs:
     representations:
       - embedding_flat
       - dcnv2_logit
+  - name: deepfm_proxy_excluded_nonlinear
+    group: nonlinear_screening
+    root: deepfm_proxy_excluded
+    input_baseline: raw_proxy_excluded_all
+    probe_type: nonlinear
+    representations:
+      - embedding_flat
+      - dnn_linear_0
+      - dnn_linear_3
+  - name: dcnv2_proxy_excluded_nonlinear
+    group: nonlinear_screening
+    root: dcnv2_proxy_excluded
+    input_baseline: raw_proxy_excluded_all
+    probe_type: nonlinear
+    representations:
+      - embedding_flat
+      - cross_layer_0
+      - dcnv2_final

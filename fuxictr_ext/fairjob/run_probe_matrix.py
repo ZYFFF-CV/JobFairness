@@ -28,7 +28,13 @@ def parse_args() -> argparse.Namespace:
         "--matrix", default="configs/fairjob/stage1_1_probe_matrix.yaml"
     )
     parser.add_argument(
-        "--group", choices=["input_controls", "layer_screening", "positive_control"]
+        "--group",
+        choices=[
+            "input_controls",
+            "layer_screening",
+            "nonlinear_screening",
+            "positive_control",
+        ],
     )
     parser.add_argument("--mode", choices=["print", "foreground", "status"], default="print")
     parser.add_argument("--resume", action="store_true")
@@ -128,7 +134,7 @@ def layer_commands(matrix: dict, group: str) -> list[tuple[str, list[str], Path]
                 "--representation",
                 representation,
                 "--probe_type",
-                "linear",
+                job.get("probe_type", "linear"),
                 "--max_rows_per_split",
                 str(matrix["max_rows_per_split"]),
                 "--seed",
@@ -149,7 +155,7 @@ def commands_for_group(matrix: dict, group: str) -> list[tuple[str, list[str], P
     """Return commands in dependency order for the requested probe group."""
 
     commands = input_commands(matrix, group)
-    if group in {"layer_screening", "positive_control"}:
+    if group in {"layer_screening", "nonlinear_screening", "positive_control"}:
         commands.extend(layer_commands(matrix, group))
     if not commands:
         raise ValueError(f"No probe jobs found for group {group!r}.")
