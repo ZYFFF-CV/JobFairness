@@ -224,3 +224,30 @@ def validate_representation_directory(path: str | Path) -> dict:
     if total_rows != manifest["rows"]:
         raise ValueError("Representation manifest row count does not match shards.")
     return manifest
+
+
+def load_representation_row_ids(
+    path: str | Path, validate_shards: bool = True
+) -> tuple[dict, np.ndarray]:
+    """Return a representation manifest and its ordered split-local row IDs.
+
+    Full shard validation is deliberately optional here. M3 validates each
+    representation set once while creating its frozen probe sample, then layer
+    probes reuse the same manifest without repeatedly hashing large NPZ files.
+    """
+
+    path = Path(path)
+    if validate_shards:
+        manifest = validate_representation_directory(path)
+    else:
+        manifest = json.loads((path / "manifest.json").read_text(encoding="utf-8"))
+    row_ids = []
+    for shard_info in manifest["shards"]:
+        with np.load(path / shard_info["path"]) as shard:
+            row_ids.append(np.asarray(shard["row_id"], dtype=np.int64))
+    combined = np.concatenate(row_ids) if row_ids else np.empty(0, dtype=np.int64)
+    if len(combined) != manifest["rows"]:
+        raise ValueError(f"Representation row count does not match manifest: {path}")
+    if len(combined) > 1 and not np.all(np.diff(combined) > 0):
+        raise ValueError(f"Representation row IDs are not strictly increasing: {path}")
+    return manifest, combined

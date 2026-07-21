@@ -1,0 +1,78 @@
+version: 1
+workdir_root: /root/autodl-tmp/workdirs/JobFairness/stage1_1
+data_dir: /root/autodl-tmp/datasets/FairJob/processed
+seed: 2019
+max_rows_per_split: 50000
+
+representation_roots:
+  deepfm_proxy_excluded: training/deepfm_pre_ranking_proxy_excluded/representations
+  deepfm_proxy_included: training/deepfm_pre_ranking_proxy_included/representations
+  dcnv2_proxy_excluded: training/dcnv2_pre_ranking_proxy_excluded/representations
+  dcnv2_proxy_included: training/dcnv2_pre_ranking_proxy_included/representations
+
+input_jobs:
+  - name: raw_proxy_excluded_all
+    group: input_controls
+    regime: proxy_excluded
+    feature_set: all_model_inputs
+  - name: raw_proxy_excluded_ids_only
+    group: input_controls
+    regime: proxy_excluded
+    feature_set: ids_only
+  - name: raw_proxy_excluded_non_id
+    group: input_controls
+    regime: proxy_excluded
+    feature_set: non_id
+  - name: raw_proxy_excluded_no_user_id
+    group: input_controls
+    regime: proxy_excluded
+    feature_set: no_user_id
+  - name: raw_proxy_excluded_no_product_id
+    group: input_controls
+    regime: proxy_excluded
+    feature_set: no_product_id
+  - name: raw_proxy_included_all
+    group: positive_control
+    regime: proxy_included
+    feature_set: all_model_inputs
+
+representation_jobs:
+  - name: deepfm_proxy_excluded
+    group: layer_screening
+    root: deepfm_proxy_excluded
+    input_baseline: raw_proxy_excluded_all
+    representations:
+      - embedding_flat
+      - fm_logit
+      - dnn_linear_0
+      - dnn_linear_1
+      - dnn_linear_2
+      - dnn_linear_3
+      - deepfm_logit
+  - name: dcnv2_proxy_excluded
+    group: layer_screening
+    root: dcnv2_proxy_excluded
+    input_baseline: raw_proxy_excluded_all
+    representations:
+      - embedding_flat
+      - cross_layer_0
+      - cross_layer_1
+      - cross_layer_2
+      - parallel_dnn_linear_0
+      - parallel_dnn_linear_1
+      - dcnv2_final
+      - dcnv2_logit
+  - name: deepfm_proxy_included
+    group: positive_control
+    root: deepfm_proxy_included
+    input_baseline: raw_proxy_included_all
+    representations:
+      - embedding_flat
+      - deepfm_logit
+  - name: dcnv2_proxy_included
+    group: positive_control
+    root: dcnv2_proxy_included
+    input_baseline: raw_proxy_included_all
+    representations:
+      - embedding_flat
+      - dcnv2_logit

@@ -1,6 +1,6 @@
 import numpy as np
 
-from fuxictr_ext.fairjob.proxy_probe import fit_probe
+from fuxictr_ext.fairjob.proxy_probe import add_amplification, fit_probe
 
 
 def test_probe_selects_on_validation_and_reports_test():
@@ -25,3 +25,10 @@ def test_probe_selects_on_validation_and_reports_test():
     assert result[0]["family"] == "linear"
     assert result[0]["valid_auc"] > 0.95
     assert result[0]["test_auc"] > 0.95
+
+
+def test_amplification_matches_stage1_1_definition():
+    probe = {"test_auc": 0.8}
+    add_amplification(probe, input_baseline_auc=0.7)
+    assert np.isclose(probe["leakage_amplification"], 0.1)
+    assert np.isclose(probe["input_normalized_amplification"], 1.5)
