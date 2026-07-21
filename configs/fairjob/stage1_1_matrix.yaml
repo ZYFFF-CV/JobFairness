@@ -2,6 +2,7 @@ version: 1
 workdir_root: /root/autodl-tmp/workdirs/JobFairness/stage1_1
 config_dir: /root/autodl-tmp/workdirs/JobFairness/stage1_1/runtime_config
 gpu: 0
+representation_seed: 2019
 
 jobs:
   - name: deepfm_pre_ranking_proxy_excluded

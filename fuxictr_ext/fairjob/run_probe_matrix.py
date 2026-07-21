@@ -35,6 +35,7 @@ def parse_args() -> argparse.Namespace:
             "nonlinear_screening",
             "identity_layer_screening",
             "identity_nonlinear_screening",
+            "identity_multiseed_screening",
             "positive_control",
         ],
     )
@@ -164,6 +165,7 @@ def commands_for_group(matrix: dict, group: str) -> list[tuple[str, list[str], P
         "nonlinear_screening",
         "identity_layer_screening",
         "identity_nonlinear_screening",
+        "identity_multiseed_screening",
         "positive_control",
     }:
         commands.extend(layer_commands(matrix, group))

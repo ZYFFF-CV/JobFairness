@@ -32,6 +32,11 @@ def parse_args() -> argparse.Namespace:
         default="print",
     )
     parser.add_argument("--dry_run", action="store_true")
+    parser.add_argument(
+        "--representations_only",
+        action="store_true",
+        help="Re-export aligned representations from completed checkpoints.",
+    )
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--expected_commit", default=None)
     return parser.parse_args()
@@ -64,12 +69,19 @@ def atomic_json(path: Path, payload: dict) -> None:
     temporary.replace(path)
 
 
-def command_for_job(job: dict, matrix: dict, dry_run: bool) -> tuple[list[str], Path]:
+def command_for_job(
+    job: dict,
+    matrix: dict,
+    dry_run: bool,
+    representations_only: bool = False,
+) -> tuple[list[str], Path]:
     """Build a shell-free Python command and its isolated run directory."""
 
     expid = job["expid"]
     dataset_id = job["dataset_id"]
     phase = "dry_run" if dry_run else "training"
+    if dry_run and representations_only:
+        raise ValueError("Representation-only export cannot be a dry run.")
     if dry_run:
         if not expid.endswith("_full") or not dataset_id.endswith("_full"):
             raise ValueError("Dry-run matrix jobs must point to full experiment IDs.")
@@ -90,7 +102,21 @@ def command_for_job(job: dict, matrix: dict, dry_run: bool) -> tuple[list[str], 
         "--run_dir",
         str(run_dir),
     ]
-    if dry_run:
+    if representations_only:
+        command.extend(
+            [
+                "--export_representations_only",
+                "--representation_out",
+                str(run_dir / "representations_aligned"),
+                "--representation_splits",
+                "train,valid,test",
+                "--representation_max_rows_per_split",
+                "200000",
+                "--representation_seed",
+                str(matrix.get("representation_seed", 2019)),
+            ]
+        )
+    elif dry_run:
         command.append("--dry_run")
     elif job.get("export_representations", False):
         command.extend(
@@ -147,17 +173,24 @@ def run_foreground(args: argparse.Namespace, matrix: dict) -> None:
     if args.expected_commit and commit != args.expected_commit:
         raise ValueError(f"Expected commit {args.expected_commit}, found {commit}.")
     for job in select_jobs(matrix, args.group):
-        command, run_dir = command_for_job(job, matrix, args.dry_run)
-        success_path = run_dir / "job.success.json"
+        command, run_dir = command_for_job(
+            job, matrix, args.dry_run, args.representations_only
+        )
+        artifact_prefix = (
+            "representation_export" if args.representations_only else "job"
+        )
+        success_path = run_dir / f"{artifact_prefix}.success.json"
         if args.resume and success_path.exists():
             continue
         run_dir.mkdir(parents=True, exist_ok=True)
         atomic_json(
-            run_dir / "job.command.json",
+            run_dir / f"{artifact_prefix}.command.json",
             {"command": command, "git_commit": commit, "job": job},
         )
         started = datetime.now(timezone.utc).isoformat()
-        returncode = run_streaming(command, PROJECT_ROOT, run_dir / "runner.log")
+        returncode = run_streaming(
+            command, PROJECT_ROOT, run_dir / f"{artifact_prefix}.runner.log"
+        )
         payload = {
             "job": job["name"],
             "git_commit": commit,
@@ -166,7 +199,7 @@ def run_foreground(args: argparse.Namespace, matrix: dict) -> None:
             "returncode": returncode,
         }
         if returncode != 0:
-            atomic_json(run_dir / "job.failed.json", payload)
+            atomic_json(run_dir / f"{artifact_prefix}.failed.json", payload)
             raise RuntimeError(f"Stage1.1 job failed: {job['name']}")
         atomic_json(success_path, payload)
 
@@ -191,6 +224,8 @@ def detach(args: argparse.Namespace, matrix: dict) -> None:
     ]
     if args.dry_run:
         command.append("--dry_run")
+    if args.representations_only:
+        command.append("--representations_only")
     if args.expected_commit:
         command.extend(["--expected_commit", args.expected_commit])
     log = log_path.open("a", encoding="utf-8")
@@ -219,18 +254,23 @@ def print_status(args: argparse.Namespace, matrix: dict) -> None:
 
     status = []
     for job in select_jobs(matrix, args.group):
-        _, run_dir = command_for_job(job, matrix, args.dry_run)
+        _, run_dir = command_for_job(
+            job, matrix, args.dry_run, args.representations_only
+        )
+        artifact_prefix = (
+            "representation_export" if args.representations_only else "job"
+        )
         state = "pending"
         marker = None
-        if (run_dir / "job.success.json").exists():
+        if (run_dir / f"{artifact_prefix}.success.json").exists():
             state = "complete"
-            marker = run_dir / "job.success.json"
-        elif (run_dir / "job.failed.json").exists():
+            marker = run_dir / f"{artifact_prefix}.success.json"
+        elif (run_dir / f"{artifact_prefix}.failed.json").exists():
             state = "failed"
-            marker = run_dir / "job.failed.json"
-        elif (run_dir / "job.command.json").exists():
+            marker = run_dir / f"{artifact_prefix}.failed.json"
+        elif (run_dir / f"{artifact_prefix}.command.json").exists():
             state = "started"
-            marker = run_dir / "job.command.json"
+            marker = run_dir / f"{artifact_prefix}.command.json"
         status.append(
             {
                 "job": job["name"],
@@ -248,7 +288,9 @@ def main() -> None:
     matrix = read_matrix(args.matrix)
     if args.mode == "print":
         for job in select_jobs(matrix, args.group):
-            command, _ = command_for_job(job, matrix, args.dry_run)
+            command, _ = command_for_job(
+                job, matrix, args.dry_run, args.representations_only
+            )
             print(json.dumps(command))
     elif args.mode == "foreground":
         run_foreground(args, matrix)

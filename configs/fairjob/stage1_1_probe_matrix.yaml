@@ -11,6 +11,10 @@ representation_roots:
   dcnv2_proxy_included: training/dcnv2_pre_ranking_proxy_included/representations
   deepfm_no_user_id: training/deepfm_pre_ranking_no_user_id/representations
   dcnv2_no_user_id: training/dcnv2_pre_ranking_no_user_id/representations
+  deepfm_no_user_id_seed2020: training/deepfm_pre_ranking_no_user_id_seed2020/representations_aligned
+  deepfm_no_user_id_seed2021: training/deepfm_pre_ranking_no_user_id_seed2021/representations_aligned
+  dcnv2_no_user_id_seed2020: training/dcnv2_pre_ranking_no_user_id_seed2020/representations_aligned
+  dcnv2_no_user_id_seed2021: training/dcnv2_pre_ranking_no_user_id_seed2021/representations_aligned
 
 input_jobs:
   - name: raw_proxy_excluded_all
@@ -138,6 +142,42 @@ representation_jobs:
   - name: dcnv2_no_user_id_matched_nonlinear
     group: identity_nonlinear_screening
     root: dcnv2_no_user_id
+    input_baseline: raw_proxy_excluded_no_user_id_nonlinear
+    probe_type: nonlinear
+    representations:
+      - embedding_flat
+      - cross_layer_0
+      - dcnv2_final
+  - name: deepfm_no_user_id_seed2020_matched_nonlinear
+    group: identity_multiseed_screening
+    root: deepfm_no_user_id_seed2020
+    input_baseline: raw_proxy_excluded_no_user_id_nonlinear
+    probe_type: nonlinear
+    representations:
+      - embedding_flat
+      - dnn_linear_0
+      - dnn_linear_3
+  - name: deepfm_no_user_id_seed2021_matched_nonlinear
+    group: identity_multiseed_screening
+    root: deepfm_no_user_id_seed2021
+    input_baseline: raw_proxy_excluded_no_user_id_nonlinear
+    probe_type: nonlinear
+    representations:
+      - embedding_flat
+      - dnn_linear_0
+      - dnn_linear_3
+  - name: dcnv2_no_user_id_seed2020_matched_nonlinear
+    group: identity_multiseed_screening
+    root: dcnv2_no_user_id_seed2020
+    input_baseline: raw_proxy_excluded_no_user_id_nonlinear
+    probe_type: nonlinear
+    representations:
+      - embedding_flat
+      - cross_layer_0
+      - dcnv2_final
+  - name: dcnv2_no_user_id_seed2021_matched_nonlinear
+    group: identity_multiseed_screening
+    root: dcnv2_no_user_id_seed2021
     input_baseline: raw_proxy_excluded_no_user_id_nonlinear
     probe_type: nonlinear
     representations:

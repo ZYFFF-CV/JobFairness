@@ -65,6 +65,17 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--representation_shard_rows", type=int, default=10000)
     parser.add_argument("--representation_max_rows_per_split", type=int, default=None)
+    parser.add_argument(
+        "--representation_seed",
+        type=int,
+        default=None,
+        help="Sampling seed for bounded representation exports; defaults to model seed.",
+    )
+    parser.add_argument(
+        "--export_representations_only",
+        action="store_true",
+        help="Load the best checkpoint and export representations without retraining.",
+    )
     return parser.parse_args()
 
 
@@ -160,6 +171,14 @@ def export_requested_representations(model, feature_map, params: dict, args) -> 
         feature_map, stage="both", **export_params
     ).make_iterator()
     generators = {"train": train_gen, "valid": valid_gen, "test": test_gen}
+    # Model initialization and bounded export sampling are separate sources of
+    # randomness. A fixed export seed keeps cross-seed representation probes on
+    # identical rows while preserving independent model-training seeds.
+    representation_seed = (
+        args.representation_seed
+        if args.representation_seed is not None
+        else params["seed"]
+    )
     manifests = {}
     for split in ("train", "valid", "test"):
         if split in requested:
@@ -171,7 +190,8 @@ def export_requested_representations(model, feature_map, params: dict, args) -> 
                 split=split,
                 shard_rows=args.representation_shard_rows,
                 max_rows=args.representation_max_rows_per_split,
-                sample_seed=params["seed"] + {"train": 0, "valid": 1, "test": 2}[split],
+                sample_seed=representation_seed
+                + {"train": 0, "valid": 1, "test": 2}[split],
             )
     return manifests
 
@@ -190,6 +210,10 @@ def main() -> None:
         params["seed"] = args.seed
     if args.epochs is not None:
         params["epochs"] = args.epochs
+    if args.export_representations_only and not args.representation_out:
+        raise ValueError("--export_representations_only requires --representation_out.")
+    if args.export_representations_only and args.dry_run:
+        raise ValueError("Representation-only export cannot be combined with --dry_run.")
     run_dir, prediction_out = configure_paths(args, params)
 
     set_logger(params)
@@ -222,15 +246,50 @@ def main() -> None:
         "seed": params["seed"],
         "gpu": args.gpu,
     }
-    manifest_path = run_dir / "run_manifest.json" if run_dir else None
+    manifest_name = (
+        "representation_export_manifest.json"
+        if args.export_representations_only
+        else "run_manifest.json"
+    )
+    manifest_path = run_dir / manifest_name if run_dir else None
     if manifest_path:
         write_run_manifest(manifest_path, manifest)
 
     first_batch = next(iter(train_gen))
+    if args.export_representations_only:
+        if not Path(model.checkpoint).exists():
+            raise FileNotFoundError(f"Model checkpoint not found: {model.checkpoint}")
+        model.load_weights(model.checkpoint)
     forward_check = validate_forward_adapter(model, first_batch)
     logging.info("Forward adapter check: " + print_to_json(forward_check))
     if args.dry_run:
         manifest.update({"status": "dry_run_complete", "forward_check": forward_check})
+        if manifest_path:
+            write_run_manifest(manifest_path, manifest)
+        print(json.dumps(manifest, indent=2, sort_keys=True))
+        return
+
+    if args.export_representations_only:
+        del train_gen, valid_gen
+        gc.collect()
+        representation_manifests = export_requested_representations(
+            model, feature_map, params, args
+        )
+        manifest.update(
+            {
+                "status": "representation_export_complete",
+                "checkpoint": model.checkpoint,
+                "representation_seed": (
+                    args.representation_seed
+                    if args.representation_seed is not None
+                    else params["seed"]
+                ),
+                "representation_splits": {
+                    split: item["rows"]
+                    for split, item in representation_manifests.items()
+                },
+            }
+        )
         if manifest_path:
             write_run_manifest(manifest_path, manifest)
         print(json.dumps(manifest, indent=2, sort_keys=True))

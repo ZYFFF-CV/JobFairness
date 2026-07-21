@@ -45,6 +45,21 @@ def test_multiseed_jobs_use_isolated_run_dirs_and_explicit_seeds():
         assert str(job["seed"]) in run_dir.name
 
 
+def test_multiseed_representation_exports_reuse_fixed_sampling_seed():
+    matrix = read_matrix(ROOT / "configs/fairjob/stage1_1_matrix.yaml")
+    jobs = select_jobs(matrix, "identity_multiseed")
+    commands_and_dirs = [
+        command_for_job(job, matrix, dry_run=False, representations_only=True)
+        for job in jobs
+    ]
+    for command, run_dir in commands_and_dirs:
+        assert "--export_representations_only" in command
+        seed_index = command.index("--representation_seed")
+        assert command[seed_index + 1] == "2019"
+        out_index = command.index("--representation_out")
+        assert command[out_index + 1] == str(run_dir / "representations_aligned")
+
+
 def test_streaming_runner_mirrors_output_to_terminal_and_log(tmp_path, capsys):
     log_path = tmp_path / "runner.log"
     returncode = run_streaming(
