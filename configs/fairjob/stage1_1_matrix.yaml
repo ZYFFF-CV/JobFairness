@@ -1,0 +1,46 @@
+version: 1
+workdir_root: /root/autodl-tmp/workdirs/JobFairness/stage1_1
+config_dir: /root/autodl-tmp/workdirs/JobFairness/stage1_1/runtime_config
+gpu: 0
+
+jobs:
+  - name: deepfm_pre_ranking_proxy_excluded
+    group: primary_screening
+    expid: DeepFM_fairjob_pre_ranking_proxy_excluded_full
+    dataset_id: fairjob_pre_ranking_proxy_excluded_full
+    export_representations: true
+  - name: deepfm_pre_ranking_proxy_included
+    group: primary_screening
+    expid: DeepFM_fairjob_pre_ranking_proxy_included_full
+    dataset_id: fairjob_pre_ranking_proxy_included_full
+    export_representations: true
+  - name: dcnv2_pre_ranking_proxy_excluded
+    group: primary_screening
+    expid: DCNv2_fairjob_pre_ranking_proxy_excluded_full
+    dataset_id: fairjob_pre_ranking_proxy_excluded_full
+    export_representations: true
+  - name: dcnv2_pre_ranking_proxy_included
+    group: primary_screening
+    expid: DCNv2_fairjob_pre_ranking_proxy_included_full
+    dataset_id: fairjob_pre_ranking_proxy_included_full
+    export_representations: true
+  - name: deepfm_post_display_proxy_excluded
+    group: auxiliary_post_display
+    expid: DeepFM_fairjob_post_display_proxy_excluded_full
+    dataset_id: fairjob_post_display_proxy_excluded_full
+    export_representations: false
+  - name: deepfm_post_display_proxy_included
+    group: auxiliary_post_display
+    expid: DeepFM_fairjob_post_display_proxy_included_full
+    dataset_id: fairjob_post_display_proxy_included_full
+    export_representations: false
+  - name: dcnv2_post_display_proxy_excluded
+    group: auxiliary_post_display
+    expid: DCNv2_fairjob_post_display_proxy_excluded_full
+    dataset_id: fairjob_post_display_proxy_excluded_full
+    export_representations: false
+  - name: dcnv2_post_display_proxy_included
+    group: auxiliary_post_display
+    expid: DCNv2_fairjob_post_display_proxy_included_full
+    dataset_id: fairjob_post_display_proxy_included_full
+    export_representations: false

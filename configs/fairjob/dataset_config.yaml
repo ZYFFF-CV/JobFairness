@@ -28,7 +28,7 @@ fairjob_unaware_smoke:
     active: true
     dtype: str
     type: categorical
-  - name: &id001
+  - name:
     - rank
     - num16
     - num17
@@ -73,13 +73,20 @@ fairjob_unaware_smoke:
     name: click
     dtype: float
   fairjob_regime: unaware
+  fairjob_regime_name: proxy-excluded
+  fairjob_protocol: legacy_integration
+  fairjob_protocol_name: legacy-integration
   fairjob_mode: smoke
   fairjob_meta_path: data/FairJob/processed/smoke_test_meta.csv
+  fairjob_split_meta_paths:
+    train: data/FairJob/processed/smoke_train_meta.csv
+    valid: data/FairJob/processed/smoke_valid_meta.csv
+    test: data/FairJob/processed/smoke_test_meta.csv
   fairjob_processed_dir: data/FairJob/processed
 fairjob_unaware_full:
   data_root: data/FairJob/fuxictr
   data_format: csv
-  train_data: data/FairJob/processed/train_full.csv
+  train_data: data/FairJob/processed/train.csv
   valid_data: data/FairJob/processed/valid.csv
   test_data: data/FairJob/processed/test.csv
   min_categr_count: 1
@@ -106,7 +113,43 @@ fairjob_unaware_full:
     active: true
     dtype: str
     type: categorical
-  - name: *id001
+  - name:
+    - rank
+    - num16
+    - num17
+    - num18
+    - num19
+    - num20
+    - num21
+    - num22
+    - num23
+    - num24
+    - num25
+    - num26
+    - num27
+    - num28
+    - num29
+    - num30
+    - num31
+    - num32
+    - num33
+    - num34
+    - num35
+    - num36
+    - num37
+    - num38
+    - num39
+    - num40
+    - num41
+    - num42
+    - num43
+    - num44
+    - num45
+    - num46
+    - num47
+    - num48
+    - num49
+    - num50
     active: true
     dtype: float
     type: numeric
@@ -115,8 +158,15 @@ fairjob_unaware_full:
     name: click
     dtype: float
   fairjob_regime: unaware
+  fairjob_regime_name: proxy-excluded
+  fairjob_protocol: legacy_integration
+  fairjob_protocol_name: legacy-integration
   fairjob_mode: full
   fairjob_meta_path: data/FairJob/processed/test_meta.csv
+  fairjob_split_meta_paths:
+    train: data/FairJob/processed/train_meta.csv
+    valid: data/FairJob/processed/valid_meta.csv
+    test: data/FairJob/processed/test_meta.csv
   fairjob_processed_dir: data/FairJob/processed
 fairjob_unfair_smoke:
   data_root: data/FairJob/fuxictr
@@ -149,7 +199,43 @@ fairjob_unfair_smoke:
     active: true
     dtype: str
     type: categorical
-  - name: *id001
+  - name:
+    - rank
+    - num16
+    - num17
+    - num18
+    - num19
+    - num20
+    - num21
+    - num22
+    - num23
+    - num24
+    - num25
+    - num26
+    - num27
+    - num28
+    - num29
+    - num30
+    - num31
+    - num32
+    - num33
+    - num34
+    - num35
+    - num36
+    - num37
+    - num38
+    - num39
+    - num40
+    - num41
+    - num42
+    - num43
+    - num44
+    - num45
+    - num46
+    - num47
+    - num48
+    - num49
+    - num50
     active: true
     dtype: float
     type: numeric
@@ -158,13 +244,20 @@ fairjob_unfair_smoke:
     name: click
     dtype: float
   fairjob_regime: unfair
+  fairjob_regime_name: proxy-included
+  fairjob_protocol: legacy_integration
+  fairjob_protocol_name: legacy-integration
   fairjob_mode: smoke
   fairjob_meta_path: data/FairJob/processed/smoke_test_meta.csv
+  fairjob_split_meta_paths:
+    train: data/FairJob/processed/smoke_train_meta.csv
+    valid: data/FairJob/processed/smoke_valid_meta.csv
+    test: data/FairJob/processed/smoke_test_meta.csv
   fairjob_processed_dir: data/FairJob/processed
 fairjob_unfair_full:
   data_root: data/FairJob/fuxictr
   data_format: csv
-  train_data: data/FairJob/processed/train_full.csv
+  train_data: data/FairJob/processed/train.csv
   valid_data: data/FairJob/processed/valid.csv
   test_data: data/FairJob/processed/test.csv
   min_categr_count: 1
@@ -192,7 +285,43 @@ fairjob_unfair_full:
     active: true
     dtype: str
     type: categorical
-  - name: *id001
+  - name:
+    - rank
+    - num16
+    - num17
+    - num18
+    - num19
+    - num20
+    - num21
+    - num22
+    - num23
+    - num24
+    - num25
+    - num26
+    - num27
+    - num28
+    - num29
+    - num30
+    - num31
+    - num32
+    - num33
+    - num34
+    - num35
+    - num36
+    - num37
+    - num38
+    - num39
+    - num40
+    - num41
+    - num42
+    - num43
+    - num44
+    - num45
+    - num46
+    - num47
+    - num48
+    - num49
+    - num50
     active: true
     dtype: float
     type: numeric
@@ -201,6 +330,681 @@ fairjob_unfair_full:
     name: click
     dtype: float
   fairjob_regime: unfair
+  fairjob_regime_name: proxy-included
+  fairjob_protocol: legacy_integration
+  fairjob_protocol_name: legacy-integration
   fairjob_mode: full
   fairjob_meta_path: data/FairJob/processed/test_meta.csv
+  fairjob_split_meta_paths:
+    train: data/FairJob/processed/train_meta.csv
+    valid: data/FairJob/processed/valid_meta.csv
+    test: data/FairJob/processed/test_meta.csv
+  fairjob_processed_dir: data/FairJob/processed
+fairjob_pre_ranking_proxy_excluded_smoke:
+  data_root: data/FairJob/fuxictr
+  data_format: csv
+  train_data: data/FairJob/processed/smoke_train.csv
+  valid_data: data/FairJob/processed/smoke_valid.csv
+  test_data: data/FairJob/processed/smoke_test.csv
+  min_categr_count: 1
+  feature_cols:
+  - name:
+    - user_id
+    - product_id
+    - cat0
+    - cat1
+    - cat2
+    - cat3
+    - cat4
+    - cat5
+    - cat6
+    - cat7
+    - cat8
+    - cat9
+    - cat10
+    - cat11
+    - cat12
+    - senior
+    active: true
+    dtype: str
+    type: categorical
+  - name:
+    - num16
+    - num17
+    - num18
+    - num19
+    - num20
+    - num21
+    - num22
+    - num23
+    - num24
+    - num25
+    - num26
+    - num27
+    - num28
+    - num29
+    - num30
+    - num31
+    - num32
+    - num33
+    - num34
+    - num35
+    - num36
+    - num37
+    - num38
+    - num39
+    - num40
+    - num41
+    - num42
+    - num43
+    - num44
+    - num45
+    - num46
+    - num47
+    - num48
+    - num49
+    - num50
+    active: true
+    dtype: float
+    type: numeric
+    normalizer: StandardScaler
+  label_col:
+    name: click
+    dtype: float
+  fairjob_regime: proxy_excluded
+  fairjob_regime_name: proxy-excluded
+  fairjob_protocol: pre_ranking
+  fairjob_protocol_name: pre-ranking
+  fairjob_mode: smoke
+  fairjob_meta_path: data/FairJob/processed/smoke_test_meta.csv
+  fairjob_split_meta_paths:
+    train: data/FairJob/processed/smoke_train_meta.csv
+    valid: data/FairJob/processed/smoke_valid_meta.csv
+    test: data/FairJob/processed/smoke_test_meta.csv
+  fairjob_processed_dir: data/FairJob/processed
+fairjob_pre_ranking_proxy_excluded_full:
+  data_root: data/FairJob/fuxictr
+  data_format: csv
+  train_data: data/FairJob/processed/train.csv
+  valid_data: data/FairJob/processed/valid.csv
+  test_data: data/FairJob/processed/test.csv
+  min_categr_count: 1
+  feature_cols:
+  - name:
+    - user_id
+    - product_id
+    - cat0
+    - cat1
+    - cat2
+    - cat3
+    - cat4
+    - cat5
+    - cat6
+    - cat7
+    - cat8
+    - cat9
+    - cat10
+    - cat11
+    - cat12
+    - senior
+    active: true
+    dtype: str
+    type: categorical
+  - name:
+    - num16
+    - num17
+    - num18
+    - num19
+    - num20
+    - num21
+    - num22
+    - num23
+    - num24
+    - num25
+    - num26
+    - num27
+    - num28
+    - num29
+    - num30
+    - num31
+    - num32
+    - num33
+    - num34
+    - num35
+    - num36
+    - num37
+    - num38
+    - num39
+    - num40
+    - num41
+    - num42
+    - num43
+    - num44
+    - num45
+    - num46
+    - num47
+    - num48
+    - num49
+    - num50
+    active: true
+    dtype: float
+    type: numeric
+    normalizer: StandardScaler
+  label_col:
+    name: click
+    dtype: float
+  fairjob_regime: proxy_excluded
+  fairjob_regime_name: proxy-excluded
+  fairjob_protocol: pre_ranking
+  fairjob_protocol_name: pre-ranking
+  fairjob_mode: full
+  fairjob_meta_path: data/FairJob/processed/test_meta.csv
+  fairjob_split_meta_paths:
+    train: data/FairJob/processed/train_meta.csv
+    valid: data/FairJob/processed/valid_meta.csv
+    test: data/FairJob/processed/test_meta.csv
+  fairjob_processed_dir: data/FairJob/processed
+fairjob_pre_ranking_proxy_included_smoke:
+  data_root: data/FairJob/fuxictr
+  data_format: csv
+  train_data: data/FairJob/processed/smoke_train.csv
+  valid_data: data/FairJob/processed/smoke_valid.csv
+  test_data: data/FairJob/processed/smoke_test.csv
+  min_categr_count: 1
+  feature_cols:
+  - name:
+    - user_id
+    - product_id
+    - cat0
+    - cat1
+    - cat2
+    - cat3
+    - cat4
+    - cat5
+    - cat6
+    - cat7
+    - cat8
+    - cat9
+    - cat10
+    - cat11
+    - cat12
+    - senior
+    - protected_attribute_feat
+    active: true
+    dtype: str
+    type: categorical
+  - name:
+    - num16
+    - num17
+    - num18
+    - num19
+    - num20
+    - num21
+    - num22
+    - num23
+    - num24
+    - num25
+    - num26
+    - num27
+    - num28
+    - num29
+    - num30
+    - num31
+    - num32
+    - num33
+    - num34
+    - num35
+    - num36
+    - num37
+    - num38
+    - num39
+    - num40
+    - num41
+    - num42
+    - num43
+    - num44
+    - num45
+    - num46
+    - num47
+    - num48
+    - num49
+    - num50
+    active: true
+    dtype: float
+    type: numeric
+    normalizer: StandardScaler
+  label_col:
+    name: click
+    dtype: float
+  fairjob_regime: proxy_included
+  fairjob_regime_name: proxy-included
+  fairjob_protocol: pre_ranking
+  fairjob_protocol_name: pre-ranking
+  fairjob_mode: smoke
+  fairjob_meta_path: data/FairJob/processed/smoke_test_meta.csv
+  fairjob_split_meta_paths:
+    train: data/FairJob/processed/smoke_train_meta.csv
+    valid: data/FairJob/processed/smoke_valid_meta.csv
+    test: data/FairJob/processed/smoke_test_meta.csv
+  fairjob_processed_dir: data/FairJob/processed
+fairjob_pre_ranking_proxy_included_full:
+  data_root: data/FairJob/fuxictr
+  data_format: csv
+  train_data: data/FairJob/processed/train.csv
+  valid_data: data/FairJob/processed/valid.csv
+  test_data: data/FairJob/processed/test.csv
+  min_categr_count: 1
+  feature_cols:
+  - name:
+    - user_id
+    - product_id
+    - cat0
+    - cat1
+    - cat2
+    - cat3
+    - cat4
+    - cat5
+    - cat6
+    - cat7
+    - cat8
+    - cat9
+    - cat10
+    - cat11
+    - cat12
+    - senior
+    - protected_attribute_feat
+    active: true
+    dtype: str
+    type: categorical
+  - name:
+    - num16
+    - num17
+    - num18
+    - num19
+    - num20
+    - num21
+    - num22
+    - num23
+    - num24
+    - num25
+    - num26
+    - num27
+    - num28
+    - num29
+    - num30
+    - num31
+    - num32
+    - num33
+    - num34
+    - num35
+    - num36
+    - num37
+    - num38
+    - num39
+    - num40
+    - num41
+    - num42
+    - num43
+    - num44
+    - num45
+    - num46
+    - num47
+    - num48
+    - num49
+    - num50
+    active: true
+    dtype: float
+    type: numeric
+    normalizer: StandardScaler
+  label_col:
+    name: click
+    dtype: float
+  fairjob_regime: proxy_included
+  fairjob_regime_name: proxy-included
+  fairjob_protocol: pre_ranking
+  fairjob_protocol_name: pre-ranking
+  fairjob_mode: full
+  fairjob_meta_path: data/FairJob/processed/test_meta.csv
+  fairjob_split_meta_paths:
+    train: data/FairJob/processed/train_meta.csv
+    valid: data/FairJob/processed/valid_meta.csv
+    test: data/FairJob/processed/test_meta.csv
+  fairjob_processed_dir: data/FairJob/processed
+fairjob_post_display_proxy_excluded_smoke:
+  data_root: data/FairJob/fuxictr
+  data_format: csv
+  train_data: data/FairJob/processed/smoke_train.csv
+  valid_data: data/FairJob/processed/smoke_valid.csv
+  test_data: data/FairJob/processed/smoke_test.csv
+  min_categr_count: 1
+  feature_cols:
+  - name:
+    - user_id
+    - product_id
+    - cat0
+    - cat1
+    - cat2
+    - cat3
+    - cat4
+    - cat5
+    - cat6
+    - cat7
+    - cat8
+    - cat9
+    - cat10
+    - cat11
+    - cat12
+    - senior
+    - displayrandom
+    active: true
+    dtype: str
+    type: categorical
+  - name:
+    - rank
+    - num16
+    - num17
+    - num18
+    - num19
+    - num20
+    - num21
+    - num22
+    - num23
+    - num24
+    - num25
+    - num26
+    - num27
+    - num28
+    - num29
+    - num30
+    - num31
+    - num32
+    - num33
+    - num34
+    - num35
+    - num36
+    - num37
+    - num38
+    - num39
+    - num40
+    - num41
+    - num42
+    - num43
+    - num44
+    - num45
+    - num46
+    - num47
+    - num48
+    - num49
+    - num50
+    active: true
+    dtype: float
+    type: numeric
+    normalizer: StandardScaler
+  label_col:
+    name: click
+    dtype: float
+  fairjob_regime: proxy_excluded
+  fairjob_regime_name: proxy-excluded
+  fairjob_protocol: post_display
+  fairjob_protocol_name: post-display
+  fairjob_mode: smoke
+  fairjob_meta_path: data/FairJob/processed/smoke_test_meta.csv
+  fairjob_split_meta_paths:
+    train: data/FairJob/processed/smoke_train_meta.csv
+    valid: data/FairJob/processed/smoke_valid_meta.csv
+    test: data/FairJob/processed/smoke_test_meta.csv
+  fairjob_processed_dir: data/FairJob/processed
+fairjob_post_display_proxy_excluded_full:
+  data_root: data/FairJob/fuxictr
+  data_format: csv
+  train_data: data/FairJob/processed/train.csv
+  valid_data: data/FairJob/processed/valid.csv
+  test_data: data/FairJob/processed/test.csv
+  min_categr_count: 1
+  feature_cols:
+  - name:
+    - user_id
+    - product_id
+    - cat0
+    - cat1
+    - cat2
+    - cat3
+    - cat4
+    - cat5
+    - cat6
+    - cat7
+    - cat8
+    - cat9
+    - cat10
+    - cat11
+    - cat12
+    - senior
+    - displayrandom
+    active: true
+    dtype: str
+    type: categorical
+  - name:
+    - rank
+    - num16
+    - num17
+    - num18
+    - num19
+    - num20
+    - num21
+    - num22
+    - num23
+    - num24
+    - num25
+    - num26
+    - num27
+    - num28
+    - num29
+    - num30
+    - num31
+    - num32
+    - num33
+    - num34
+    - num35
+    - num36
+    - num37
+    - num38
+    - num39
+    - num40
+    - num41
+    - num42
+    - num43
+    - num44
+    - num45
+    - num46
+    - num47
+    - num48
+    - num49
+    - num50
+    active: true
+    dtype: float
+    type: numeric
+    normalizer: StandardScaler
+  label_col:
+    name: click
+    dtype: float
+  fairjob_regime: proxy_excluded
+  fairjob_regime_name: proxy-excluded
+  fairjob_protocol: post_display
+  fairjob_protocol_name: post-display
+  fairjob_mode: full
+  fairjob_meta_path: data/FairJob/processed/test_meta.csv
+  fairjob_split_meta_paths:
+    train: data/FairJob/processed/train_meta.csv
+    valid: data/FairJob/processed/valid_meta.csv
+    test: data/FairJob/processed/test_meta.csv
+  fairjob_processed_dir: data/FairJob/processed
+fairjob_post_display_proxy_included_smoke:
+  data_root: data/FairJob/fuxictr
+  data_format: csv
+  train_data: data/FairJob/processed/smoke_train.csv
+  valid_data: data/FairJob/processed/smoke_valid.csv
+  test_data: data/FairJob/processed/smoke_test.csv
+  min_categr_count: 1
+  feature_cols:
+  - name:
+    - user_id
+    - product_id
+    - cat0
+    - cat1
+    - cat2
+    - cat3
+    - cat4
+    - cat5
+    - cat6
+    - cat7
+    - cat8
+    - cat9
+    - cat10
+    - cat11
+    - cat12
+    - senior
+    - displayrandom
+    - protected_attribute_feat
+    active: true
+    dtype: str
+    type: categorical
+  - name:
+    - rank
+    - num16
+    - num17
+    - num18
+    - num19
+    - num20
+    - num21
+    - num22
+    - num23
+    - num24
+    - num25
+    - num26
+    - num27
+    - num28
+    - num29
+    - num30
+    - num31
+    - num32
+    - num33
+    - num34
+    - num35
+    - num36
+    - num37
+    - num38
+    - num39
+    - num40
+    - num41
+    - num42
+    - num43
+    - num44
+    - num45
+    - num46
+    - num47
+    - num48
+    - num49
+    - num50
+    active: true
+    dtype: float
+    type: numeric
+    normalizer: StandardScaler
+  label_col:
+    name: click
+    dtype: float
+  fairjob_regime: proxy_included
+  fairjob_regime_name: proxy-included
+  fairjob_protocol: post_display
+  fairjob_protocol_name: post-display
+  fairjob_mode: smoke
+  fairjob_meta_path: data/FairJob/processed/smoke_test_meta.csv
+  fairjob_split_meta_paths:
+    train: data/FairJob/processed/smoke_train_meta.csv
+    valid: data/FairJob/processed/smoke_valid_meta.csv
+    test: data/FairJob/processed/smoke_test_meta.csv
+  fairjob_processed_dir: data/FairJob/processed
+fairjob_post_display_proxy_included_full:
+  data_root: data/FairJob/fuxictr
+  data_format: csv
+  train_data: data/FairJob/processed/train.csv
+  valid_data: data/FairJob/processed/valid.csv
+  test_data: data/FairJob/processed/test.csv
+  min_categr_count: 1
+  feature_cols:
+  - name:
+    - user_id
+    - product_id
+    - cat0
+    - cat1
+    - cat2
+    - cat3
+    - cat4
+    - cat5
+    - cat6
+    - cat7
+    - cat8
+    - cat9
+    - cat10
+    - cat11
+    - cat12
+    - senior
+    - displayrandom
+    - protected_attribute_feat
+    active: true
+    dtype: str
+    type: categorical
+  - name:
+    - rank
+    - num16
+    - num17
+    - num18
+    - num19
+    - num20
+    - num21
+    - num22
+    - num23
+    - num24
+    - num25
+    - num26
+    - num27
+    - num28
+    - num29
+    - num30
+    - num31
+    - num32
+    - num33
+    - num34
+    - num35
+    - num36
+    - num37
+    - num38
+    - num39
+    - num40
+    - num41
+    - num42
+    - num43
+    - num44
+    - num45
+    - num46
+    - num47
+    - num48
+    - num49
+    - num50
+    active: true
+    dtype: float
+    type: numeric
+    normalizer: StandardScaler
+  label_col:
+    name: click
+    dtype: float
+  fairjob_regime: proxy_included
+  fairjob_regime_name: proxy-included
+  fairjob_protocol: post_display
+  fairjob_protocol_name: post-display
+  fairjob_mode: full
+  fairjob_meta_path: data/FairJob/processed/test_meta.csv
+  fairjob_split_meta_paths:
+    train: data/FairJob/processed/train_meta.csv
+    valid: data/FairJob/processed/valid_meta.csv
+    test: data/FairJob/processed/test_meta.csv
   fairjob_processed_dir: data/FairJob/processed

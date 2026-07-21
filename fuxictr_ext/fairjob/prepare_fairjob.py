@@ -37,6 +37,7 @@ META_COLUMNS = [
     "protected_attribute",
     "senior",
     "displayrandom",
+    "rank",
     "impression_id",
     "product_id",
 ]
@@ -202,22 +203,32 @@ def prepare_split(
     train_candidate = df.iloc[:cut].copy()
     test = add_row_id(df.iloc[cut:].copy())
     train, valid, valid_policy = split_train_valid(train_candidate, valid_rows)
+    train = add_row_id(train)
+    valid = add_row_id(valid)
 
     if prefix:
         train_name = f"{prefix}_train.csv"
         valid_name = f"{prefix}_valid.csv"
         test_name = f"{prefix}_test.csv"
+        train_meta_name = f"{prefix}_train_meta.csv"
+        valid_meta_name = f"{prefix}_valid_meta.csv"
         meta_name = f"{prefix}_test_meta.csv"
     else:
-        write_csv(add_row_id(train_candidate), out_dir / "train_full.csv")
+        train_full = add_row_id(train_candidate)
+        write_csv(train_full, out_dir / "train_full.csv")
+        write_csv(train_full[META_COLUMNS], out_dir / "train_full_meta.csv")
         train_name = "train.csv"
         valid_name = "valid.csv"
         test_name = "test.csv"
+        train_meta_name = "train_meta.csv"
+        valid_meta_name = "valid_meta.csv"
         meta_name = "test_meta.csv"
 
-    write_csv(add_row_id(train), out_dir / train_name)
-    write_csv(add_row_id(valid), out_dir / valid_name)
+    write_csv(train, out_dir / train_name)
+    write_csv(valid, out_dir / valid_name)
     write_csv(test, out_dir / test_name)
+    write_csv(train[META_COLUMNS], out_dir / train_meta_name)
+    write_csv(valid[META_COLUMNS], out_dir / valid_meta_name)
     write_csv(test[META_COLUMNS], out_dir / meta_name)
 
     return {

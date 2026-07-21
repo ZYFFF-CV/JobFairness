@@ -56,6 +56,7 @@ def write_prediction_csv(
     expid: str | None = None,
     hparams_source: str | None = None,
     seed: int | None = None,
+    protocol: str | None = None,
 ) -> pd.DataFrame:
     """Write the canonical prediction CSV aligned to a meta file.
 
@@ -86,6 +87,8 @@ def write_prediction_csv(
         pred["hparams_source"] = hparams_source
     if seed is not None:
         pred["seed"] = seed
+    if protocol is not None:
+        pred["protocol"] = protocol
 
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)

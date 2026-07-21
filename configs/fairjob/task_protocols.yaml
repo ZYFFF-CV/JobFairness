@@ -1,0 +1,38 @@
+version: 1
+primary_protocol: pre_ranking
+
+protocols:
+  legacy_integration:
+    scientific_name: legacy-integration
+    purpose: Reproduce the Stage1.0 engineering anchor only.
+    excluded_features: []
+    allow_impression_id: true
+    primary: false
+
+  pre_ranking:
+    scientific_name: pre-ranking
+    purpose: Score candidates before display and position assignment.
+    excluded_features:
+      - impression_id
+      - rank
+      - displayrandom
+    allow_impression_id: false
+    primary: true
+
+  post_display:
+    scientific_name: post-display
+    purpose: Estimate click response after display context is observed.
+    excluded_features:
+      - impression_id
+    allow_impression_id: false
+    primary: false
+
+evaluator_metadata:
+  - row_id
+  - click
+  - protected_attribute
+  - senior
+  - displayrandom
+  - rank
+  - impression_id
+  - product_id

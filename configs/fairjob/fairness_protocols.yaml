@@ -1,0 +1,36 @@
+version: 1
+
+proxy_regimes:
+  proxy_excluded:
+    scientific_name: proxy-excluded
+    legacy_name: unaware
+    include_protected_proxy: false
+  proxy_included:
+    scientific_name: proxy-included
+    legacy_name: unfair
+    include_protected_proxy: true
+
+selection_protocols:
+  all_logged:
+    scientific_name: all-logged
+    filter: null
+    status: implemented
+  random_display:
+    scientific_name: random-display
+    filter:
+      displayrandom: 1
+    status: implemented
+  context_conditioned:
+    scientific_name: context-conditioned
+    filter: runtime
+    status: implemented
+  position_corrected:
+    scientific_name: position-corrected
+    propensity_column: logging_propensity
+    status: requires_external_propensity
+
+reporting:
+  protected_attribute_term: behavioral protected proxy
+  forbid_verified_gender_claim: true
+  primary_dp_scope: senior
+  primary_utility_scope: random_display
