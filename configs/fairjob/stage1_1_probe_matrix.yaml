@@ -184,3 +184,50 @@ representation_jobs:
       - embedding_flat
       - cross_layer_0
       - dcnv2_final
+
+ablation_jobs:
+  - name: deepfm_no_user_id_seed2019_dnn0
+    group: interaction_screening
+    root: deepfm_no_user_id
+    representation: dnn_linear_0
+    baseline_result: deepfm_no_user_id_matched_nonlinear__dnn_linear_0
+  - name: deepfm_no_user_id_seed2020_dnn0
+    group: interaction_screening
+    root: deepfm_no_user_id_seed2020
+    representation: dnn_linear_0
+    baseline_result: deepfm_no_user_id_seed2020_matched_nonlinear__dnn_linear_0
+  - name: deepfm_no_user_id_seed2021_dnn0
+    group: interaction_screening
+    root: deepfm_no_user_id_seed2021
+    representation: dnn_linear_0
+    baseline_result: deepfm_no_user_id_seed2021_matched_nonlinear__dnn_linear_0
+  - name: dcnv2_no_user_id_seed2019_cross0
+    group: interaction_screening
+    root: dcnv2_no_user_id
+    representation: cross_layer_0
+    baseline_result: dcnv2_no_user_id_matched_nonlinear__cross_layer_0
+  - name: dcnv2_no_user_id_seed2020_cross0
+    group: interaction_screening
+    root: dcnv2_no_user_id_seed2020
+    representation: cross_layer_0
+    baseline_result: dcnv2_no_user_id_seed2020_matched_nonlinear__cross_layer_0
+  - name: dcnv2_no_user_id_seed2021_cross0
+    group: interaction_screening
+    root: dcnv2_no_user_id_seed2021
+    representation: cross_layer_0
+    baseline_result: dcnv2_no_user_id_seed2021_matched_nonlinear__cross_layer_0
+  - name: dcnv2_no_user_id_seed2019_final
+    group: interaction_screening
+    root: dcnv2_no_user_id
+    representation: dcnv2_final
+    baseline_result: dcnv2_no_user_id_matched_nonlinear__dcnv2_final
+  - name: dcnv2_no_user_id_seed2020_final
+    group: interaction_screening
+    root: dcnv2_no_user_id_seed2020
+    representation: dcnv2_final
+    baseline_result: dcnv2_no_user_id_seed2020_matched_nonlinear__dcnv2_final
+  - name: dcnv2_no_user_id_seed2021_final
+    group: interaction_screening
+    root: dcnv2_no_user_id_seed2021
+    representation: dcnv2_final
+    baseline_result: dcnv2_no_user_id_seed2021_matched_nonlinear__dcnv2_final

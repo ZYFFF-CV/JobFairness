@@ -20,6 +20,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 SAMPLE_SCRIPT = PROJECT_ROOT / "fuxictr_ext/fairjob/prepare_probe_samples.py"
 INPUT_SCRIPT = PROJECT_ROOT / "fuxictr_ext/fairjob/input_proxy_probe.py"
 LAYER_SCRIPT = PROJECT_ROOT / "fuxictr_ext/fairjob/proxy_probe.py"
+ABLATION_SCRIPT = PROJECT_ROOT / "fuxictr_ext/fairjob/interaction_ablation.py"
 
 
 def parse_args() -> argparse.Namespace:
@@ -36,6 +37,7 @@ def parse_args() -> argparse.Namespace:
             "identity_layer_screening",
             "identity_nonlinear_screening",
             "identity_multiseed_screening",
+            "interaction_screening",
             "positive_control",
         ],
     )
@@ -156,6 +158,42 @@ def layer_commands(matrix: dict, group: str) -> list[tuple[str, list[str], Path]
     return commands
 
 
+def ablation_commands(matrix: dict, group: str) -> list[tuple[str, list[str], Path]]:
+    """Build frozen-probe targeted and matched-random masking commands."""
+
+    _, probe_dir, roots = resolve_layout(matrix)
+    sample_path = probe_dir / "probe_rows.npz"
+    commands = []
+    for job in matrix.get("ablation_jobs", []):
+        if job["group"] != group:
+            continue
+        name = job["name"]
+        output = probe_dir / "ablations" / f"{name}.json"
+        baseline_result = probe_dir / "layers" / f"{job['baseline_result']}.json"
+        command = [
+            sys.executable,
+            str(ABLATION_SCRIPT),
+            "--representation_root",
+            str(roots[job["root"]]),
+            "--representation",
+            job["representation"],
+            "--probe_sample",
+            str(sample_path),
+            "--baseline_result",
+            str(baseline_result),
+            "--mask_fraction",
+            str(job.get("mask_fraction", 0.1)),
+            "--random_repeats",
+            str(job.get("random_repeats", 10)),
+            "--seed",
+            str(matrix["seed"]),
+            "--out",
+            str(output),
+        ]
+        commands.append((name, command, output))
+    return commands
+
+
 def commands_for_group(matrix: dict, group: str) -> list[tuple[str, list[str], Path]]:
     """Return commands in dependency order for the requested probe group."""
 
@@ -169,6 +207,8 @@ def commands_for_group(matrix: dict, group: str) -> list[tuple[str, list[str], P
         "positive_control",
     }:
         commands.extend(layer_commands(matrix, group))
+    if group == "interaction_screening":
+        commands.extend(ablation_commands(matrix, group))
     if not commands:
         raise ValueError(f"No probe jobs found for group {group!r}.")
     return commands
