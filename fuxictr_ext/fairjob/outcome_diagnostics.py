@@ -62,6 +62,69 @@ def bootstrap_statistic(frame: pd.DataFrame) -> dict:
     }
 
 
+def proxy_measurement_sensitivity(
+    frame: pd.DataFrame,
+    rates: tuple[float, ...] = (0.05, 0.1, 0.2),
+    repeats: int = 20,
+    seed: int = 2019,
+) -> dict:
+    """Perturb evaluator proxy labels without changing model predictions.
+
+    Symmetric and one-direction flips test label-noise sensitivity. Random
+    missingness evaluates complete cases after dropping the selected proxy
+    labels. These are measurement diagnostics for a behavioral proxy, not a
+    simulation of verified gender-label corruption.
+    """
+
+    if repeats < 1:
+        raise ValueError("Proxy sensitivity repeats must be positive.")
+    rng = np.random.default_rng(seed)
+    original = frame["protected_attribute"].to_numpy(dtype=np.int8)
+    modes = ("symmetric_flip", "group_0_to_1", "group_1_to_0", "random_missing")
+    results = {}
+    for mode in modes:
+        mode_results = {}
+        for rate in rates:
+            if not 0.0 < rate < 1.0:
+                raise ValueError("Proxy perturbation rates must be between zero and one.")
+            values = []
+            for _ in range(repeats):
+                draw = rng.random(len(frame)) < rate
+                perturbed = original.copy()
+                keep = np.ones(len(frame), dtype=bool)
+                if mode == "symmetric_flip":
+                    perturbed[draw] = 1 - perturbed[draw]
+                elif mode == "group_0_to_1":
+                    selected = draw & (original == 0)
+                    perturbed[selected] = 1
+                elif mode == "group_1_to_0":
+                    selected = draw & (original == 1)
+                    perturbed[selected] = 0
+                else:
+                    keep = ~draw
+                modified = frame.loc[keep].copy()
+                modified["protected_attribute"] = perturbed[keep]
+                dp = demographic_parity_details(modified)
+                values.append((dp["DP_signed"], dp["DP_abs"], len(modified)))
+            array = np.asarray(values, dtype=float)
+            mode_results[str(rate)] = {
+                "DP_signed_mean": float(array[:, 0].mean()),
+                "DP_signed_std": float(array[:, 0].std(ddof=1))
+                if repeats > 1
+                else 0.0,
+                "DP_abs_mean": float(array[:, 1].mean()),
+                "rows_mean": float(array[:, 2].mean()),
+            }
+        results[mode] = mode_results
+    return {
+        "rates": list(rates),
+        "repeats": repeats,
+        "seed": seed,
+        "perturbation_target": "behavioral_protected_proxy_evaluation_labels_only",
+        "modes": results,
+    }
+
+
 def build_frame(pred_path: str | Path, meta_path: str | Path) -> tuple[pd.DataFrame, dict]:
     """Restore raw evaluator metadata in the canonical prediction row order."""
 
@@ -132,6 +195,9 @@ def run_diagnostics(
         "selection_scopes": scopes,
         "dp_context_decomposition": decomposition,
         "cluster_bootstrap": bootstraps,
+        "proxy_measurement_sensitivity": proxy_measurement_sensitivity(
+            all_logged, repeats=bootstrap_repeats, seed=seed + 2
+        ),
         "position_corrected": position_status,
         "claim_boundary": "descriptive_association_not_causal_effect",
     }
