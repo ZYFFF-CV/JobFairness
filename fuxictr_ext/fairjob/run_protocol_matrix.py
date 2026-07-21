@@ -103,6 +103,8 @@ def command_for_job(job: dict, matrix: dict, dry_run: bool) -> tuple[list[str], 
                 "200000",
             ]
         )
+    if "seed" in job:
+        command.extend(["--seed", str(job["seed"])])
     return command, run_dir
 
 

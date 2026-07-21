@@ -33,6 +33,18 @@ def test_dry_run_uses_smoke_config_without_training_flag():
     assert "--representation_out" not in command
 
 
+def test_multiseed_jobs_use_isolated_run_dirs_and_explicit_seeds():
+    matrix = read_matrix(ROOT / "configs/fairjob/stage1_1_matrix.yaml")
+    jobs = select_jobs(matrix, "identity_multiseed")
+    assert len(jobs) == 4
+    commands_and_dirs = [command_for_job(job, matrix, dry_run=False) for job in jobs]
+    assert len({str(run_dir) for _, run_dir in commands_and_dirs}) == 4
+    for job, (command, run_dir) in zip(jobs, commands_and_dirs):
+        seed_index = command.index("--seed")
+        assert command[seed_index + 1] == str(job["seed"])
+        assert str(job["seed"]) in run_dir.name
+
+
 def test_streaming_runner_mirrors_output_to_terminal_and_log(tmp_path, capsys):
     log_path = tmp_path / "runner.log"
     returncode = run_streaming(

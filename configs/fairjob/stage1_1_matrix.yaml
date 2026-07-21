@@ -74,3 +74,27 @@ jobs:
     expid: DCNv2_fairjob_pre_ranking_no_identity_ids_proxy_excluded_full
     dataset_id: fairjob_pre_ranking_no_identity_ids_proxy_excluded_full
     export_representations: true
+  - name: deepfm_pre_ranking_no_user_id_seed2020
+    group: identity_multiseed
+    expid: DeepFM_fairjob_pre_ranking_no_user_id_proxy_excluded_full
+    dataset_id: fairjob_pre_ranking_no_user_id_proxy_excluded_full
+    seed: 2020
+    export_representations: true
+  - name: deepfm_pre_ranking_no_user_id_seed2021
+    group: identity_multiseed
+    expid: DeepFM_fairjob_pre_ranking_no_user_id_proxy_excluded_full
+    dataset_id: fairjob_pre_ranking_no_user_id_proxy_excluded_full
+    seed: 2021
+    export_representations: true
+  - name: dcnv2_pre_ranking_no_user_id_seed2020
+    group: identity_multiseed
+    expid: DCNv2_fairjob_pre_ranking_no_user_id_proxy_excluded_full
+    dataset_id: fairjob_pre_ranking_no_user_id_proxy_excluded_full
+    seed: 2020
+    export_representations: true
+  - name: dcnv2_pre_ranking_no_user_id_seed2021
+    group: identity_multiseed
+    expid: DCNv2_fairjob_pre_ranking_no_user_id_proxy_excluded_full
+    dataset_id: fairjob_pre_ranking_no_user_id_proxy_excluded_full
+    seed: 2021
+    export_representations: true
