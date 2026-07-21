@@ -14,6 +14,8 @@ def test_cluster_bootstrap_is_deterministic_and_keeps_cluster_blocks():
 
     def statistic(sample):
         cluster_means = sample.groupby("impression_id")["value"].mean()
+        if "_original_impression_id" in sample:
+            assert sample["_original_impression_id"].notna().all()
         return {"mean": float(cluster_means.mean())}
 
     first = cluster_bootstrap(frame, "impression_id", statistic, repeats=20, seed=7)

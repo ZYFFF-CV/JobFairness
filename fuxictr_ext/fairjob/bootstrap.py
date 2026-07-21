@@ -29,8 +29,7 @@ def cluster_bootstrap(
         raise ValueError("Bootstrap repeats must be positive.")
     if not 0.0 < confidence < 1.0:
         raise ValueError("confidence must be between zero and one.")
-    grouped = {key: value for key, value in frame.groupby(cluster_column, sort=False)}
-    cluster_keys = np.asarray(list(grouped), dtype=object)
+    cluster_keys = frame[cluster_column].drop_duplicates().to_numpy()
     if len(cluster_keys) < 2:
         raise ValueError("Cluster bootstrap requires at least two clusters.")
 
@@ -38,15 +37,19 @@ def cluster_bootstrap(
     samples = {name: [] for name in point}
     rng = np.random.default_rng(seed)
     original_name = f"_original_{cluster_column}"
+    source = frame.rename(columns={cluster_column: original_name})
     for _ in range(repeats):
         selected = rng.choice(cluster_keys, size=len(cluster_keys), replace=True)
-        blocks = []
-        for draw_index, key in enumerate(selected):
-            block = grouped[key].copy()
-            block[original_name] = block[cluster_column]
-            block[cluster_column] = draw_index
-            blocks.append(block)
-        replicate = statistic(pd.concat(blocks, ignore_index=True))
+        # A relational join expands repeated draws in compiled pandas code and
+        # avoids a Python loop over tens of thousands of impression blocks.
+        draws = pd.DataFrame(
+            {
+                original_name: selected,
+                cluster_column: np.arange(len(selected), dtype=np.int64),
+            }
+        )
+        replicate_frame = draws.merge(source, on=original_name, how="left", sort=False)
+        replicate = statistic(replicate_frame)
         for name in point:
             value = float(replicate[name])
             if not np.isfinite(value):
