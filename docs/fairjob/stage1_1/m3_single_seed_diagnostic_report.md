@@ -118,9 +118,18 @@ interaction-amplification mechanism.
 ## Required next experiment and stop boundary
 
 The next causal diagnostic is full retraining of DeepFM and DCNv2 under three
-feature controls: no `user_id`, no `product_id`, and no user/product IDs. Smoke
-runs should verify the generated configs first. Full runs are long training and
+feature controls: no `user_id`, no `product_id`, and no user/product IDs. All
+six forward-only smoke dry runs completed on the server at `f47ce9e`; each
+reported zero prediction difference between the native and representation
+adapter paths. No optimizer step was executed. Full runs are long training and
 are intentionally not started as part of this report.
+
+After replacing `COMMIT_SHA` with the final report commit, the foreground
+server command is:
+
+```text
+/root/autodl-tmp/workdirs/JobFairness/venv/bin/python fuxictr_ext/fairjob/run_protocol_matrix.py --group identity_interventions --mode foreground --resume --expected_commit COMMIT_SHA
+```
 
 Only if a repeatable layer increase remains in the no-user-ID models should M3
 continue to targeted path/layer masking, matched-sparsity random masking, at
