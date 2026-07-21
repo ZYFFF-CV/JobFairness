@@ -1,0 +1,19 @@
+version: 1
+workdir_root: /root/autodl-tmp/workdirs/JobFairness/stage1_1
+meta_path: /root/autodl-tmp/datasets/FairJob/processed/test_meta.csv
+bootstrap_repeats: 20
+seed: 2019
+
+jobs:
+  - name: deepfm_no_user_id_seed2019
+    prediction: training/deepfm_pre_ranking_no_user_id/predictions/DeepFM_fairjob_pre_ranking_no_user_id_proxy_excluded_full.csv
+  - name: deepfm_no_user_id_seed2020
+    prediction: training/deepfm_pre_ranking_no_user_id_seed2020/predictions/DeepFM_fairjob_pre_ranking_no_user_id_proxy_excluded_full.csv
+  - name: deepfm_no_user_id_seed2021
+    prediction: training/deepfm_pre_ranking_no_user_id_seed2021/predictions/DeepFM_fairjob_pre_ranking_no_user_id_proxy_excluded_full.csv
+  - name: dcnv2_no_user_id_seed2019
+    prediction: training/dcnv2_pre_ranking_no_user_id/predictions/DCNv2_fairjob_pre_ranking_no_user_id_proxy_excluded_full.csv
+  - name: dcnv2_no_user_id_seed2020
+    prediction: training/dcnv2_pre_ranking_no_user_id_seed2020/predictions/DCNv2_fairjob_pre_ranking_no_user_id_proxy_excluded_full.csv
+  - name: dcnv2_no_user_id_seed2021
+    prediction: training/dcnv2_pre_ranking_no_user_id_seed2021/predictions/DCNv2_fairjob_pre_ranking_no_user_id_proxy_excluded_full.csv
