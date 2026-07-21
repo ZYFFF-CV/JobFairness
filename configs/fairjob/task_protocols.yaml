@@ -19,6 +19,40 @@ protocols:
     allow_impression_id: false
     primary: true
 
+  pre_ranking_no_user_id:
+    scientific_name: pre-ranking-no-user-id
+    purpose: Test whether identity-linked proxy leakage depends on user identity.
+    excluded_features:
+      - impression_id
+      - rank
+      - displayrandom
+      - user_id
+    allow_impression_id: false
+    primary: false
+
+  pre_ranking_no_product_id:
+    scientific_name: pre-ranking-no-product-id
+    purpose: Control for product identity while retaining user identity.
+    excluded_features:
+      - impression_id
+      - rank
+      - displayrandom
+      - product_id
+    allow_impression_id: false
+    primary: false
+
+  pre_ranking_no_identity_ids:
+    scientific_name: pre-ranking-no-user-product-id
+    purpose: Measure proxy leakage without user or product identity features.
+    excluded_features:
+      - impression_id
+      - rank
+      - displayrandom
+      - user_id
+      - product_id
+    allow_impression_id: false
+    primary: false
+
   post_display:
     scientific_name: post-display
     purpose: Estimate click response after display context is observed.

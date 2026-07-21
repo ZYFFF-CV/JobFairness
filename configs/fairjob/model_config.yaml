@@ -287,6 +287,162 @@ DeepFM_fairjob_post_display_proxy_included_full:
   hidden_activations: relu
   batch_norm: false
   net_dropout: 0.1
+DeepFM_fairjob_pre_ranking_no_user_id_proxy_excluded_smoke:
+  model: FairJobDeepFM
+  dataset_id: fairjob_pre_ranking_no_user_id_proxy_excluded_smoke
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 1024
+  embedding_dim: 16
+  epochs: 1
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  hidden_units:
+  - 256
+  - 128
+  - 64
+  hidden_activations: relu
+  batch_norm: false
+  net_dropout: 0.1
+DeepFM_fairjob_pre_ranking_no_user_id_proxy_excluded_full:
+  model: FairJobDeepFM
+  dataset_id: fairjob_pre_ranking_no_user_id_proxy_excluded_full
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 4096
+  embedding_dim: 16
+  epochs: 20
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  hidden_units:
+  - 256
+  - 128
+  - 64
+  hidden_activations: relu
+  batch_norm: false
+  net_dropout: 0.1
+DeepFM_fairjob_pre_ranking_no_product_id_proxy_excluded_smoke:
+  model: FairJobDeepFM
+  dataset_id: fairjob_pre_ranking_no_product_id_proxy_excluded_smoke
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 1024
+  embedding_dim: 16
+  epochs: 1
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  hidden_units:
+  - 256
+  - 128
+  - 64
+  hidden_activations: relu
+  batch_norm: false
+  net_dropout: 0.1
+DeepFM_fairjob_pre_ranking_no_product_id_proxy_excluded_full:
+  model: FairJobDeepFM
+  dataset_id: fairjob_pre_ranking_no_product_id_proxy_excluded_full
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 4096
+  embedding_dim: 16
+  epochs: 20
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  hidden_units:
+  - 256
+  - 128
+  - 64
+  hidden_activations: relu
+  batch_norm: false
+  net_dropout: 0.1
+DeepFM_fairjob_pre_ranking_no_identity_ids_proxy_excluded_smoke:
+  model: FairJobDeepFM
+  dataset_id: fairjob_pre_ranking_no_identity_ids_proxy_excluded_smoke
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 1024
+  embedding_dim: 16
+  epochs: 1
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  hidden_units:
+  - 256
+  - 128
+  - 64
+  hidden_activations: relu
+  batch_norm: false
+  net_dropout: 0.1
+DeepFM_fairjob_pre_ranking_no_identity_ids_proxy_excluded_full:
+  model: FairJobDeepFM
+  dataset_id: fairjob_pre_ranking_no_identity_ids_proxy_excluded_full
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 4096
+  embedding_dim: 16
+  epochs: 20
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  hidden_units:
+  - 256
+  - 128
+  - 64
+  hidden_activations: relu
+  batch_norm: false
+  net_dropout: 0.1
 DCNv2_fairjob_pre_ranking_proxy_excluded_smoke:
   model: FairJobDCNv2
   dataset_id: fairjob_pre_ranking_proxy_excluded_smoke
@@ -521,6 +677,204 @@ DCNv2_fairjob_post_display_proxy_included_smoke:
 DCNv2_fairjob_post_display_proxy_included_full:
   model: FairJobDCNv2
   dataset_id: fairjob_post_display_proxy_included_full
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 4096
+  embedding_dim: 16
+  epochs: 20
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+DCNv2_fairjob_pre_ranking_no_user_id_proxy_excluded_smoke:
+  model: FairJobDCNv2
+  dataset_id: fairjob_pre_ranking_no_user_id_proxy_excluded_smoke
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 1024
+  embedding_dim: 16
+  epochs: 1
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+DCNv2_fairjob_pre_ranking_no_user_id_proxy_excluded_full:
+  model: FairJobDCNv2
+  dataset_id: fairjob_pre_ranking_no_user_id_proxy_excluded_full
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 4096
+  embedding_dim: 16
+  epochs: 20
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+DCNv2_fairjob_pre_ranking_no_product_id_proxy_excluded_smoke:
+  model: FairJobDCNv2
+  dataset_id: fairjob_pre_ranking_no_product_id_proxy_excluded_smoke
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 1024
+  embedding_dim: 16
+  epochs: 1
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+DCNv2_fairjob_pre_ranking_no_product_id_proxy_excluded_full:
+  model: FairJobDCNv2
+  dataset_id: fairjob_pre_ranking_no_product_id_proxy_excluded_full
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 4096
+  embedding_dim: 16
+  epochs: 20
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+DCNv2_fairjob_pre_ranking_no_identity_ids_proxy_excluded_smoke:
+  model: FairJobDCNv2
+  dataset_id: fairjob_pre_ranking_no_identity_ids_proxy_excluded_smoke
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 1024
+  embedding_dim: 16
+  epochs: 1
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+DCNv2_fairjob_pre_ranking_no_identity_ids_proxy_excluded_full:
+  model: FairJobDCNv2
+  dataset_id: fairjob_pre_ranking_no_identity_ids_proxy_excluded_full
   loss: binary_crossentropy
   metrics:
   - logloss

@@ -44,3 +44,33 @@ jobs:
     expid: DCNv2_fairjob_post_display_proxy_included_full
     dataset_id: fairjob_post_display_proxy_included_full
     export_representations: false
+  - name: deepfm_pre_ranking_no_user_id
+    group: identity_interventions
+    expid: DeepFM_fairjob_pre_ranking_no_user_id_proxy_excluded_full
+    dataset_id: fairjob_pre_ranking_no_user_id_proxy_excluded_full
+    export_representations: true
+  - name: deepfm_pre_ranking_no_product_id
+    group: identity_interventions
+    expid: DeepFM_fairjob_pre_ranking_no_product_id_proxy_excluded_full
+    dataset_id: fairjob_pre_ranking_no_product_id_proxy_excluded_full
+    export_representations: true
+  - name: deepfm_pre_ranking_no_identity_ids
+    group: identity_interventions
+    expid: DeepFM_fairjob_pre_ranking_no_identity_ids_proxy_excluded_full
+    dataset_id: fairjob_pre_ranking_no_identity_ids_proxy_excluded_full
+    export_representations: true
+  - name: dcnv2_pre_ranking_no_user_id
+    group: identity_interventions
+    expid: DCNv2_fairjob_pre_ranking_no_user_id_proxy_excluded_full
+    dataset_id: fairjob_pre_ranking_no_user_id_proxy_excluded_full
+    export_representations: true
+  - name: dcnv2_pre_ranking_no_product_id
+    group: identity_interventions
+    expid: DCNv2_fairjob_pre_ranking_no_product_id_proxy_excluded_full
+    dataset_id: fairjob_pre_ranking_no_product_id_proxy_excluded_full
+    export_representations: true
+  - name: dcnv2_pre_ranking_no_identity_ids
+    group: identity_interventions
+    expid: DCNv2_fairjob_pre_ranking_no_identity_ids_proxy_excluded_full
+    dataset_id: fairjob_pre_ranking_no_identity_ids_proxy_excluded_full
+    export_representations: true

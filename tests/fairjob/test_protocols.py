@@ -45,3 +45,26 @@ def test_proxy_included_changes_only_protected_proxy():
     )
     assert set(included).difference(excluded) == {"protected_attribute_feat"}
     assert set(excluded).difference(included) == set()
+
+
+def test_identity_control_protocols_remove_only_requested_ids():
+    task, fairness = load_protocols(
+        ROOT / "configs/fairjob/task_protocols.yaml",
+        ROOT / "configs/fairjob/fairness_protocols.yaml",
+    )
+    manifest = load_manifest()
+    base, _, _ = features_for_protocol(
+        manifest, task, fairness, "pre_ranking", "proxy_excluded"
+    )
+    no_user, _, _ = features_for_protocol(
+        manifest, task, fairness, "pre_ranking_no_user_id", "proxy_excluded"
+    )
+    no_product, _, _ = features_for_protocol(
+        manifest, task, fairness, "pre_ranking_no_product_id", "proxy_excluded"
+    )
+    no_ids, _, _ = features_for_protocol(
+        manifest, task, fairness, "pre_ranking_no_identity_ids", "proxy_excluded"
+    )
+    assert set(base).difference(no_user) == {"user_id"}
+    assert set(base).difference(no_product) == {"product_id"}
+    assert set(base).difference(no_ids) == {"user_id", "product_id"}

@@ -194,7 +194,11 @@ def main() -> None:
                 mode=mode,
             )
 
-    for protocol in ["pre_ranking", "post_display"]:
+    # Every non-legacy task protocol receives dataset entries. This includes
+    # identity controls added after M3 without duplicating feature-list logic.
+    for protocol in task_protocols["protocols"]:
+        if protocol == "legacy_integration":
+            continue
         for regime in fairness_protocols["proxy_regimes"]:
             for mode in ["smoke", "full"]:
                 features, protocol_name, regime_name = features_for_protocol(

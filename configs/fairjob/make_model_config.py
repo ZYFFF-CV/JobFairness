@@ -9,6 +9,12 @@ import yaml
 
 
 GENERATED_PREFIXES = ("DeepFM_fairjob_", "DCNv2_fairjob_")
+PRIMARY_PROTOCOLS = ("pre_ranking", "post_display")
+IDENTITY_CONTROL_PROTOCOLS = (
+    "pre_ranking_no_user_id",
+    "pre_ranking_no_product_id",
+    "pre_ranking_no_identity_ids",
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -78,11 +84,17 @@ def generate_entries() -> dict[str, dict]:
 
     entries = {}
     for model in ("DeepFM", "DCNv2"):
-        for protocol in ("pre_ranking", "post_display"):
+        for protocol in PRIMARY_PROTOCOLS:
             for regime in ("proxy_excluded", "proxy_included"):
                 for mode in ("smoke", "full"):
                     suffix = f"fairjob_{protocol}_{regime}_{mode}"
                     entries[f"{model}_{suffix}"] = model_config(model, suffix, mode)
+        # Identity interventions answer the proxy-excluded M3 mechanism
+        # question; proxy-included variants would be redundant positive controls.
+        for protocol in IDENTITY_CONTROL_PROTOCOLS:
+            for mode in ("smoke", "full"):
+                suffix = f"fairjob_{protocol}_proxy_excluded_{mode}"
+                entries[f"{model}_{suffix}"] = model_config(model, suffix, mode)
     return entries
 
 
