@@ -46,18 +46,19 @@ cd /root/autodl-tmp/code/JobFairness
 /root/autodl-tmp/workdirs/JobFairness/venv/bin/python fuxictr_ext/fairjob/run_protocol_matrix.py --group primary_screening --mode status --dry_run
 ```
 
-## 正式后台训练
+## 正式前台训练
 
 只有 dry-run 全部完成、代码 commit 冻结并确认服务器 GPU 空闲后，才运行：
 
 ```bash
-/root/autodl-tmp/workdirs/JobFairness/venv/bin/python fuxictr_ext/fairjob/run_protocol_matrix.py --group primary_screening --mode detach --expected_commit COMMIT_SHA
+/root/autodl-tmp/workdirs/JobFairness/venv/bin/python fuxictr_ext/fairjob/run_protocol_matrix.py --group primary_screening --mode foreground --resume --expected_commit COMMIT_SHA
 ```
 
-`detach` 使用独立服务器进程会话，标准输出写入 Stage1.1 workdir。本地关机或
-SSH 断开不会终止训练。`--resume` 只跳过已经具有 success marker 的完整实验；
-FuxiCTR 当前 checkpoint 不包含 optimizer state，因此失败的单个实验会从头重跑，
-不能宣称为 epoch 内严格续训。
+`foreground` 会把 FuxiCTR 进度、epoch loss、验证指标和 early-stop 信息实时输出
+到当前终端，同时逐行保存到每个实验的 `runner.log`。关闭 SSH、关闭终端或按
+`Ctrl+C` 会中断当前前台任务。`--resume` 只跳过已经具有 success marker 的完整
+实验；FuxiCTR 当前 checkpoint 不包含 optimizer state，因此失败的单个实验会从头
+重跑，不能宣称为 epoch 内严格续训。
 
 查看正式任务状态：
 

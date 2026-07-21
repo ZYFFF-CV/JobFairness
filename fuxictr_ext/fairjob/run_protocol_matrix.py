@@ -113,8 +113,33 @@ def select_jobs(matrix: dict, group: str) -> list[dict]:
     return jobs
 
 
+def run_streaming(command: list[str], cwd: Path, log_path: Path) -> int:
+    """Mirror child output to the terminal and an on-disk log in real time."""
+
+    environment = os.environ.copy()
+    environment["PYTHONUNBUFFERED"] = "1"
+    with log_path.open("a", encoding="utf-8") as log:
+        process = subprocess.Popen(
+            command,
+            cwd=cwd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            bufsize=1,
+            env=environment,
+        )
+        if process.stdout is None:
+            raise RuntimeError("Unable to capture Stage1.1 job output.")
+        for line in process.stdout:
+            sys.stdout.write(line)
+            sys.stdout.flush()
+            log.write(line)
+            log.flush()
+        return process.wait()
+
+
 def run_foreground(args: argparse.Namespace, matrix: dict) -> None:
-    """Run selected jobs sequentially and persist resumable job markers."""
+    """Run jobs sequentially with live terminal output and durable logs."""
 
     commit = current_commit()
     if args.expected_commit and commit != args.expected_commit:
@@ -130,22 +155,15 @@ def run_foreground(args: argparse.Namespace, matrix: dict) -> None:
             {"command": command, "git_commit": commit, "job": job},
         )
         started = datetime.now(timezone.utc).isoformat()
-        with (run_dir / "runner.log").open("a", encoding="utf-8") as log:
-            result = subprocess.run(
-                command,
-                cwd=PROJECT_ROOT,
-                stdout=log,
-                stderr=subprocess.STDOUT,
-                text=True,
-            )
+        returncode = run_streaming(command, PROJECT_ROOT, run_dir / "runner.log")
         payload = {
             "job": job["name"],
             "git_commit": commit,
             "started_at": started,
             "finished_at": datetime.now(timezone.utc).isoformat(),
-            "returncode": result.returncode,
+            "returncode": returncode,
         }
-        if result.returncode != 0:
+        if returncode != 0:
             atomic_json(run_dir / "job.failed.json", payload)
             raise RuntimeError(f"Stage1.1 job failed: {job['name']}")
         atomic_json(success_path, payload)
