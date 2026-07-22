@@ -1,0 +1,115 @@
+version: 1
+workdir_root: /root/autodl-tmp/workdirs/JobFairness/stage1_1/m5
+config_dir: /root/autodl-tmp/workdirs/JobFairness/stage1_1/runtime_config
+gpu: 0
+representation_seed: 2019
+
+jobs:
+  - name: baseline_seed2019
+    group: m5a_dcnv2_three_seed
+    expid: M5DCNv2_baseline_full
+    dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full
+    seed: 2019
+    export_representations: false
+  - name: baseline_seed2020
+    group: m5a_dcnv2_three_seed
+    expid: M5DCNv2_baseline_full
+    dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full
+    seed: 2020
+    export_representations: false
+  - name: baseline_seed2021
+    group: m5a_dcnv2_three_seed
+    expid: M5DCNv2_baseline_full
+    dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full
+    seed: 2021
+    export_representations: false
+  - name: global_suppression_seed2019
+    group: m5a_dcnv2_three_seed
+    expid: M5DCNv2_global_suppression_full
+    dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full
+    seed: 2019
+    export_representations: false
+  - name: global_suppression_seed2020
+    group: m5a_dcnv2_three_seed
+    expid: M5DCNv2_global_suppression_full
+    dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full
+    seed: 2020
+    export_representations: false
+  - name: global_suppression_seed2021
+    group: m5a_dcnv2_three_seed
+    expid: M5DCNv2_global_suppression_full
+    dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full
+    seed: 2021
+    export_representations: false
+  - name: matched_random_suppression_seed2019
+    group: m5a_dcnv2_three_seed
+    expid: M5DCNv2_matched_random_suppression_full
+    dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full
+    seed: 2019
+    export_representations: false
+  - name: matched_random_suppression_seed2020
+    group: m5a_dcnv2_three_seed
+    expid: M5DCNv2_matched_random_suppression_full
+    dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full
+    seed: 2020
+    export_representations: false
+  - name: matched_random_suppression_seed2021
+    group: m5a_dcnv2_three_seed
+    expid: M5DCNv2_matched_random_suppression_full
+    dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full
+    seed: 2021
+    export_representations: false
+  - name: selective_suppression_seed2019
+    group: m5a_dcnv2_three_seed
+    expid: M5DCNv2_selective_suppression_full
+    dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full
+    seed: 2019
+    export_representations: false
+  - name: selective_suppression_seed2020
+    group: m5a_dcnv2_three_seed
+    expid: M5DCNv2_selective_suppression_full
+    dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full
+    seed: 2020
+    export_representations: false
+  - name: selective_suppression_seed2021
+    group: m5a_dcnv2_three_seed
+    expid: M5DCNv2_selective_suppression_full
+    dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full
+    seed: 2021
+    export_representations: false
+  - name: dp_regularization_seed2019
+    group: m5a_dcnv2_three_seed
+    expid: M5DCNv2_dp_regularization_full
+    dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full
+    seed: 2019
+    export_representations: false
+  - name: dp_regularization_seed2020
+    group: m5a_dcnv2_three_seed
+    expid: M5DCNv2_dp_regularization_full
+    dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full
+    seed: 2020
+    export_representations: false
+  - name: dp_regularization_seed2021
+    group: m5a_dcnv2_three_seed
+    expid: M5DCNv2_dp_regularization_full
+    dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full
+    seed: 2021
+    export_representations: false
+  - name: adversarial_seed2019
+    group: m5a_dcnv2_three_seed
+    expid: M5DCNv2_adversarial_full
+    dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full
+    seed: 2019
+    export_representations: false
+  - name: adversarial_seed2020
+    group: m5a_dcnv2_three_seed
+    expid: M5DCNv2_adversarial_full
+    dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full
+    seed: 2020
+    export_representations: false
+  - name: adversarial_seed2021
+    group: m5a_dcnv2_three_seed
+    expid: M5DCNv2_adversarial_full
+    dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full
+    seed: 2021
+    export_representations: false

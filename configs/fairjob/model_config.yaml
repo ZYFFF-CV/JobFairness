@@ -905,3 +905,495 @@ DCNv2_fairjob_pre_ranking_no_identity_ids_proxy_excluded_full:
   num_cross_layers: 3
   net_dropout: 0.1
   batch_norm: false
+M5DCNv2_baseline_smoke:
+  model: FairJobMitigatedDCNv2
+  dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_smoke
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 1024
+  embedding_dim: 16
+  epochs: 1
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+  mitigation_method: baseline
+  suppression_fraction: 0.1
+  suppression_seed_offset: 100003
+  selective_indices_config: configs/fairjob/m5_selective_indices.yaml
+  fairness_weight: 0.1
+  adversarial_weight: 0.1
+  adversary_hidden_units: 64
+  gradient_reversal_scale: 1.0
+M5DCNv2_baseline_full:
+  model: FairJobMitigatedDCNv2
+  dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 4096
+  embedding_dim: 16
+  epochs: 20
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+  mitigation_method: baseline
+  suppression_fraction: 0.1
+  suppression_seed_offset: 100003
+  selective_indices_config: configs/fairjob/m5_selective_indices.yaml
+  fairness_weight: 0.1
+  adversarial_weight: 0.1
+  adversary_hidden_units: 64
+  gradient_reversal_scale: 1.0
+M5DCNv2_global_suppression_smoke:
+  model: FairJobMitigatedDCNv2
+  dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_smoke
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 1024
+  embedding_dim: 16
+  epochs: 1
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+  mitigation_method: global_suppression
+  suppression_fraction: 0.1
+  suppression_seed_offset: 100003
+  selective_indices_config: configs/fairjob/m5_selective_indices.yaml
+  fairness_weight: 0.1
+  adversarial_weight: 0.1
+  adversary_hidden_units: 64
+  gradient_reversal_scale: 1.0
+M5DCNv2_global_suppression_full:
+  model: FairJobMitigatedDCNv2
+  dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 4096
+  embedding_dim: 16
+  epochs: 20
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+  mitigation_method: global_suppression
+  suppression_fraction: 0.1
+  suppression_seed_offset: 100003
+  selective_indices_config: configs/fairjob/m5_selective_indices.yaml
+  fairness_weight: 0.1
+  adversarial_weight: 0.1
+  adversary_hidden_units: 64
+  gradient_reversal_scale: 1.0
+M5DCNv2_matched_random_suppression_smoke:
+  model: FairJobMitigatedDCNv2
+  dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_smoke
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 1024
+  embedding_dim: 16
+  epochs: 1
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+  mitigation_method: matched_random_suppression
+  suppression_fraction: 0.1
+  suppression_seed_offset: 100003
+  selective_indices_config: configs/fairjob/m5_selective_indices.yaml
+  fairness_weight: 0.1
+  adversarial_weight: 0.1
+  adversary_hidden_units: 64
+  gradient_reversal_scale: 1.0
+M5DCNv2_matched_random_suppression_full:
+  model: FairJobMitigatedDCNv2
+  dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 4096
+  embedding_dim: 16
+  epochs: 20
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+  mitigation_method: matched_random_suppression
+  suppression_fraction: 0.1
+  suppression_seed_offset: 100003
+  selective_indices_config: configs/fairjob/m5_selective_indices.yaml
+  fairness_weight: 0.1
+  adversarial_weight: 0.1
+  adversary_hidden_units: 64
+  gradient_reversal_scale: 1.0
+M5DCNv2_selective_suppression_smoke:
+  model: FairJobMitigatedDCNv2
+  dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_smoke
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 1024
+  embedding_dim: 16
+  epochs: 1
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+  mitigation_method: selective_suppression
+  suppression_fraction: 0.1
+  suppression_seed_offset: 100003
+  selective_indices_config: configs/fairjob/m5_selective_indices.yaml
+  fairness_weight: 0.1
+  adversarial_weight: 0.1
+  adversary_hidden_units: 64
+  gradient_reversal_scale: 1.0
+M5DCNv2_selective_suppression_full:
+  model: FairJobMitigatedDCNv2
+  dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 4096
+  embedding_dim: 16
+  epochs: 20
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+  mitigation_method: selective_suppression
+  suppression_fraction: 0.1
+  suppression_seed_offset: 100003
+  selective_indices_config: configs/fairjob/m5_selective_indices.yaml
+  fairness_weight: 0.1
+  adversarial_weight: 0.1
+  adversary_hidden_units: 64
+  gradient_reversal_scale: 1.0
+M5DCNv2_dp_regularization_smoke:
+  model: FairJobMitigatedDCNv2
+  dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_smoke
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 1024
+  embedding_dim: 16
+  epochs: 1
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+  mitigation_method: dp_regularization
+  suppression_fraction: 0.1
+  suppression_seed_offset: 100003
+  selective_indices_config: configs/fairjob/m5_selective_indices.yaml
+  fairness_weight: 0.1
+  adversarial_weight: 0.1
+  adversary_hidden_units: 64
+  gradient_reversal_scale: 1.0
+M5DCNv2_dp_regularization_full:
+  model: FairJobMitigatedDCNv2
+  dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 4096
+  embedding_dim: 16
+  epochs: 20
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+  mitigation_method: dp_regularization
+  suppression_fraction: 0.1
+  suppression_seed_offset: 100003
+  selective_indices_config: configs/fairjob/m5_selective_indices.yaml
+  fairness_weight: 0.1
+  adversarial_weight: 0.1
+  adversary_hidden_units: 64
+  gradient_reversal_scale: 1.0
+M5DCNv2_adversarial_smoke:
+  model: FairJobMitigatedDCNv2
+  dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_smoke
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 1024
+  embedding_dim: 16
+  epochs: 1
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+  mitigation_method: adversarial
+  suppression_fraction: 0.1
+  suppression_seed_offset: 100003
+  selective_indices_config: configs/fairjob/m5_selective_indices.yaml
+  fairness_weight: 0.1
+  adversarial_weight: 0.1
+  adversary_hidden_units: 64
+  gradient_reversal_scale: 1.0
+M5DCNv2_adversarial_full:
+  model: FairJobMitigatedDCNv2
+  dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 4096
+  embedding_dim: 16
+  epochs: 20
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+  mitigation_method: adversarial
+  suppression_fraction: 0.1
+  suppression_seed_offset: 100003
+  selective_indices_config: configs/fairjob/m5_selective_indices.yaml
+  fairness_weight: 0.1
+  adversarial_weight: 0.1
+  adversary_hidden_units: 64
+  gradient_reversal_scale: 1.0

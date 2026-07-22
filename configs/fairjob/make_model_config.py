@@ -8,12 +8,20 @@ from pathlib import Path
 import yaml
 
 
-GENERATED_PREFIXES = ("DeepFM_fairjob_", "DCNv2_fairjob_")
+GENERATED_PREFIXES = ("DeepFM_fairjob_", "DCNv2_fairjob_", "M5DCNv2_")
 PRIMARY_PROTOCOLS = ("pre_ranking", "post_display")
 IDENTITY_CONTROL_PROTOCOLS = (
     "pre_ranking_no_user_id",
     "pre_ranking_no_product_id",
     "pre_ranking_no_identity_ids",
+)
+M5_METHODS = (
+    "baseline",
+    "global_suppression",
+    "matched_random_suppression",
+    "selective_suppression",
+    "dp_regularization",
+    "adversarial",
 )
 
 
@@ -95,6 +103,26 @@ def generate_entries() -> dict[str, dict]:
             for mode in ("smoke", "full"):
                 suffix = f"fairjob_{protocol}_proxy_excluded_{mode}"
                 entries[f"{model}_{suffix}"] = model_config(model, suffix, mode)
+    m5_dataset_prefix = "fairjob_m5_pre_ranking_no_user_id_proxy_excluded"
+    for method in M5_METHODS:
+        for mode in ("smoke", "full"):
+            dataset_id = f"{m5_dataset_prefix}_{mode}"
+            expid = f"M5DCNv2_{method}_{mode}"
+            config = model_config("DCNv2", dataset_id, mode)
+            config.update(
+                {
+                    "model": "FairJobMitigatedDCNv2",
+                    "mitigation_method": method,
+                    "suppression_fraction": 0.1,
+                    "suppression_seed_offset": 100003,
+                    "selective_indices_config": "configs/fairjob/m5_selective_indices.yaml",
+                    "fairness_weight": 0.1,
+                    "adversarial_weight": 0.1,
+                    "adversary_hidden_units": 64,
+                    "gradient_reversal_scale": 1.0,
+                }
+            )
+            entries[expid] = config
     return entries
 
 

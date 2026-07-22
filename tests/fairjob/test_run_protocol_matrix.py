@@ -70,3 +70,18 @@ def test_streaming_runner_mirrors_output_to_terminal_and_log(tmp_path, capsys):
     assert returncode == 0
     assert "live-loss=0.125" in capsys.readouterr().out
     assert "live-loss=0.125" in log_path.read_text(encoding="utf-8")
+
+
+def test_m5a_matrix_is_six_methods_by_three_seeds():
+    matrix = read_matrix(ROOT / "configs/fairjob/stage1_1_m5_matrix.yaml")
+    jobs = select_jobs(matrix, "m5a_dcnv2_three_seed")
+    assert len(jobs) == 18
+    assert {job["seed"] for job in jobs} == {2019, 2020, 2021}
+    assert len({job["name"] for job in jobs}) == 18
+    for job in jobs:
+        command, run_dir = command_for_job(job, matrix, dry_run=False)
+        assert run_dir.as_posix().startswith(
+            "/root/autodl-tmp/workdirs/JobFairness/stage1_1/m5/training/"
+        )
+        assert "--seed" in command
+        assert "--representation_out" not in command

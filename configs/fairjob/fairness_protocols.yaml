@@ -27,7 +27,8 @@ selection_protocols:
   position_corrected:
     scientific_name: position-corrected
     propensity_column: logging_propensity
-    status: requires_external_propensity
+    status: unavailable_missing_external_propensity
+    use_for_current_method_selection: false
 
 reporting:
   protected_attribute_term: behavioral protected proxy

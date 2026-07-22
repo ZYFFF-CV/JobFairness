@@ -307,7 +307,11 @@ def main() -> None:
     test_gen = RankDataLoader(feature_map, stage="test", **params).make_iterator()
     y_pred = model.predict(test_gen)
     model_name, regime, mode, protocol = infer_model_regime_mode(args.expid, params)
-    hparams_source = "stage1_1_fixed_screening"
+    hparams_source = (
+        "stage1_1_m5a_fixed"
+        if params.get("mitigation_method")
+        else "stage1_1_fixed_screening"
+    )
     meta_path = params["fairjob_meta_path"]
     write_prediction_csv(
         out_path=prediction_out,
@@ -349,6 +353,14 @@ def main() -> None:
             "net_dropout",
             "embedding_regularizer",
             "net_regularizer",
+            "mitigation_method",
+            "suppression_fraction",
+            "suppression_seed_offset",
+            "selective_indices_config",
+            "fairness_weight",
+            "adversarial_weight",
+            "adversary_hidden_units",
+            "gradient_reversal_scale",
         )
         if key in params
     }

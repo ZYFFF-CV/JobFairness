@@ -42,7 +42,11 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def feature_cols(manifest: dict, features: list[str]) -> list[dict]:
+def feature_cols(
+    manifest: dict,
+    features: list[str],
+    include_fairness_meta: bool = False,
+) -> list[dict]:
     """Return FuxiCTR feature column specs for one fairness regime.
 
     Binary context fields are modeled as categorical features to match the
@@ -79,6 +83,30 @@ def feature_cols(manifest: dict, features: list[str]) -> list[dict]:
                 "normalizer": "StandardScaler",
             }
         )
+    if include_fairness_meta:
+        # These aliases retain raw binary values in each training batch while
+        # FuxiCTR's BaseModel.get_inputs() excludes type=meta columns from the
+        # embedding stack. They are loss metadata, never model input features.
+        cols.extend(
+            [
+                {
+                    "name": "protected_attribute_meta",
+                    "active": True,
+                    "dtype": "int",
+                    "type": "meta",
+                    "remap": False,
+                    "preprocess": "copy_from(protected_attribute)",
+                },
+                {
+                    "name": "senior_meta",
+                    "active": True,
+                    "dtype": "int",
+                    "type": "meta",
+                    "remap": False,
+                    "preprocess": "copy_from(senior)",
+                },
+            ]
+        )
     return cols
 
 
@@ -92,6 +120,7 @@ def make_entry(
     protocol: str,
     protocol_name: str,
     mode: str,
+    include_fairness_meta: bool = False,
 ) -> dict:
     """Build one dataset_config entry for a regime/mode pair.
 
@@ -129,7 +158,9 @@ def make_entry(
         "valid_data": str(valid_data).replace("\\", "/"),
         "test_data": str(test_data).replace("\\", "/"),
         "min_categr_count": 1,
-        "feature_cols": feature_cols(manifest, features),
+        "feature_cols": feature_cols(
+            manifest, features, include_fairness_meta=include_fairness_meta
+        ),
         "label_col": {"name": "click", "dtype": "float"},
         "fairjob_regime": regime,
         "fairjob_regime_name": regime_name,
@@ -220,6 +251,31 @@ def main() -> None:
                     protocol_name=protocol_name,
                     mode=mode,
                 )
+
+    # M5 uses the stable no-user-id backbone selected by M3. Raw protected and
+    # senior values are carried as meta aliases for training-only mitigation
+    # losses, without changing the model-facing proxy-excluded feature list.
+    features, protocol_name, regime_name = features_for_protocol(
+        manifest,
+        task_protocols,
+        fairness_protocols,
+        "pre_ranking_no_user_id",
+        "proxy_excluded",
+    )
+    for mode in ("smoke", "full"):
+        dataset_id = f"fairjob_m5_pre_ranking_no_user_id_proxy_excluded_{mode}"
+        config[dataset_id] = make_entry(
+            manifest=manifest,
+            processed_dir=processed_dir,
+            data_root=args.data_root,
+            features=features,
+            regime="proxy_excluded",
+            regime_name=regime_name,
+            protocol="pre_ranking_no_user_id",
+            protocol_name=protocol_name,
+            mode=mode,
+            include_fairness_meta=True,
+        )
 
     out_path = Path(args.out)
     out_path.parent.mkdir(parents=True, exist_ok=True)

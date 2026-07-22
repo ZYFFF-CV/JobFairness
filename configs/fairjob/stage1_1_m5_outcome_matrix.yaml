@@ -1,0 +1,26 @@
+version: 1
+workdir_root: /root/autodl-tmp/workdirs/JobFairness/stage1_1/m5
+meta_path: /root/autodl-tmp/datasets/FairJob/processed/test_meta.csv
+context_columns: displayrandom,rank
+bootstrap_repeats: 20
+seed: 2019
+
+jobs:
+  - {name: baseline_seed2019, prediction: training/baseline_seed2019/predictions/M5DCNv2_baseline_full.csv}
+  - {name: baseline_seed2020, prediction: training/baseline_seed2020/predictions/M5DCNv2_baseline_full.csv}
+  - {name: baseline_seed2021, prediction: training/baseline_seed2021/predictions/M5DCNv2_baseline_full.csv}
+  - {name: global_suppression_seed2019, prediction: training/global_suppression_seed2019/predictions/M5DCNv2_global_suppression_full.csv}
+  - {name: global_suppression_seed2020, prediction: training/global_suppression_seed2020/predictions/M5DCNv2_global_suppression_full.csv}
+  - {name: global_suppression_seed2021, prediction: training/global_suppression_seed2021/predictions/M5DCNv2_global_suppression_full.csv}
+  - {name: matched_random_suppression_seed2019, prediction: training/matched_random_suppression_seed2019/predictions/M5DCNv2_matched_random_suppression_full.csv}
+  - {name: matched_random_suppression_seed2020, prediction: training/matched_random_suppression_seed2020/predictions/M5DCNv2_matched_random_suppression_full.csv}
+  - {name: matched_random_suppression_seed2021, prediction: training/matched_random_suppression_seed2021/predictions/M5DCNv2_matched_random_suppression_full.csv}
+  - {name: selective_suppression_seed2019, prediction: training/selective_suppression_seed2019/predictions/M5DCNv2_selective_suppression_full.csv}
+  - {name: selective_suppression_seed2020, prediction: training/selective_suppression_seed2020/predictions/M5DCNv2_selective_suppression_full.csv}
+  - {name: selective_suppression_seed2021, prediction: training/selective_suppression_seed2021/predictions/M5DCNv2_selective_suppression_full.csv}
+  - {name: dp_regularization_seed2019, prediction: training/dp_regularization_seed2019/predictions/M5DCNv2_dp_regularization_full.csv}
+  - {name: dp_regularization_seed2020, prediction: training/dp_regularization_seed2020/predictions/M5DCNv2_dp_regularization_full.csv}
+  - {name: dp_regularization_seed2021, prediction: training/dp_regularization_seed2021/predictions/M5DCNv2_dp_regularization_full.csv}
+  - {name: adversarial_seed2019, prediction: training/adversarial_seed2019/predictions/M5DCNv2_adversarial_full.csv}
+  - {name: adversarial_seed2020, prediction: training/adversarial_seed2020/predictions/M5DCNv2_adversarial_full.csv}
+  - {name: adversarial_seed2021, prediction: training/adversarial_seed2021/predictions/M5DCNv2_adversarial_full.csv}

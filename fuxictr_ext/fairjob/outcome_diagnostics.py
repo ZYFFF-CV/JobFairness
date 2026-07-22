@@ -182,15 +182,9 @@ def run_diagnostics(
             seed=seed + 1,
         ),
     }
-    position_status = {
-        "status": "unavailable",
-        "reason": "logging_propensity is absent and must not be inferred from outcomes",
-    }
+    position_status = "unavailable_missing_external_propensity"
     if "logging_propensity" in frame.columns:
-        position_status = {
-            "status": "not_run",
-            "reason": "weighted metric implementation requires a separately frozen protocol",
-        }
+        position_status = "unavailable_protocol_not_frozen"
     return {
         "selection_scopes": scopes,
         "dp_context_decomposition": decomposition,
