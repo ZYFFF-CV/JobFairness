@@ -5,6 +5,7 @@ probe_sample: /root/autodl-tmp/workdirs/JobFairness/stage1_1/probes/probe_rows.n
 probe_seed: 2019
 max_rows_per_split: 50000
 linear_max_iter: 1000
+linear_retry_max_iter: 3000
 nonlinear_max_iter: 500
 nonlinear_early_stopping: true
 

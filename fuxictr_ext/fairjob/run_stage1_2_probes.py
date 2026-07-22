@@ -19,7 +19,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--matrix", default="configs/fairjob/stage1_2_probe_matrix.yaml"
     )
-    parser.add_argument("--group", choices=["smoke", "full"], required=True)
+    parser.add_argument(
+        "--group", choices=["smoke", "full", "linear_retry"], required=True
+    )
     parser.add_argument(
         "--mode", choices=["print", "foreground", "status"], default="print"
     )
@@ -42,6 +44,16 @@ def probe_commands(matrix: dict, group: str) -> list[tuple[str, list[str], Path]
     )
     workdir = Path(matrix["workdir_root"])
     commands = []
+    retry_names = None
+    if group == "linear_retry":
+        retry_names = set()
+        for result_path in (workdir / "probes" / "full").glob("*.json"):
+            payload = json.loads(result_path.read_text(encoding="utf-8"))
+            linear = next(
+                probe for probe in payload["probes"] if probe["family"] == "linear"
+            )
+            if not linear["converged"]:
+                retry_names.add(result_path.stem)
     for job in export_matrix["jobs"]:
         representations = matrix["representations"]
         if group == "smoke":
@@ -50,6 +62,8 @@ def probe_commands(matrix: dict, group: str) -> list[tuple[str, list[str], Path]
             representations = [matrix["smoke"]["representation"]]
         for representation in representations:
             name = f"{job['name']}__{representation}"
+            if retry_names is not None and name not in retry_names:
+                continue
             output = workdir / "probes" / group / f"{name}.json"
             root = (
                 workdir
@@ -65,7 +79,7 @@ def probe_commands(matrix: dict, group: str) -> list[tuple[str, list[str], Path]
                 "--representation",
                 representation,
                 "--probe_type",
-                "both",
+                "linear" if group == "linear_retry" else "both",
                 "--max_rows_per_split",
                 str(matrix["max_rows_per_split"]),
                 "--seed",
@@ -74,7 +88,11 @@ def probe_commands(matrix: dict, group: str) -> list[tuple[str, list[str], Path]
                 str(matrix["probe_sample"]),
                 "--skip_shard_validation",
                 "--linear_max_iter",
-                str(matrix["linear_max_iter"]),
+                str(
+                    matrix["linear_retry_max_iter"]
+                    if group == "linear_retry"
+                    else matrix["linear_max_iter"]
+                ),
                 "--nonlinear_max_iter",
                 str(matrix["nonlinear_max_iter"]),
                 "--out",
