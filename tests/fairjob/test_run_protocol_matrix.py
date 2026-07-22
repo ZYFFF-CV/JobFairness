@@ -89,6 +89,11 @@ def test_m5a_matrix_is_six_methods_by_three_seeds():
 
 def test_stage1_2_matrix_reuses_all_m5a_checkpoints_and_predictions():
     matrix = read_matrix(ROOT / "configs/fairjob/stage1_2_matrix.yaml")
+    assert matrix["stage1_1_frozen_groups"] == [
+        "primary_screening",
+        "identity_interventions",
+        "identity_multiseed",
+    ]
     jobs = select_jobs(matrix, "post_intervention_export")
     assert len(jobs) == 18
     assert {job["seed"] for job in jobs} == {2019, 2020, 2021}

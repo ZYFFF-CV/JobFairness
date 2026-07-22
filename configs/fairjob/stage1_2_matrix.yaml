@@ -1,6 +1,11 @@
 version: 1
 workdir_root: /root/autodl-tmp/workdirs/JobFairness/stage1_2
 checkpoint_workdir_root: /root/autodl-tmp/workdirs/JobFairness/stage1_1/m5
+stage1_1_matrix: configs/fairjob/stage1_1_matrix.yaml
+stage1_1_frozen_groups:
+  - primary_screening
+  - identity_interventions
+  - identity_multiseed
 config_dir: /root/autodl-tmp/workdirs/JobFairness/stage1_1/runtime_config
 data_dir: /root/autodl-tmp/datasets/FairJob/processed
 probe_sample: /root/autodl-tmp/workdirs/JobFairness/stage1_1/probes/probe_rows.npz

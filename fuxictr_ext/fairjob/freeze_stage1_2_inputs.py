@@ -72,6 +72,91 @@ def _fingerprint(path: Path, include_rows: bool = False) -> dict:
     return payload
 
 
+def _representation_manifest_fingerprints(run_dir: Path) -> dict:
+    """Record manifests whose payload already contains every shard digest."""
+
+    payload = {}
+    for directory_name in ("representations", "representations_aligned"):
+        split_manifests = {}
+        for split in ("train", "valid", "test"):
+            path = run_dir / directory_name / split / "manifest.json"
+            if path.is_file():
+                manifest = json.loads(path.read_text(encoding="utf-8"))
+                split_manifests[split] = {
+                    **_fingerprint(path),
+                    "rows": manifest["rows"],
+                    "shard_count": len(manifest["shards"]),
+                    "shard_sha256": [item["sha256"] for item in manifest["shards"]],
+                }
+        if split_manifests:
+            payload[directory_name] = split_manifests
+    return payload
+
+
+def _freeze_stage1_1_diagnostic_runs(matrix: dict, expected_rows: int) -> list[dict]:
+    """Fingerprint the completed M3/M4 runs selected by the frozen groups."""
+
+    matrix_path = matrix.get("stage1_1_matrix")
+    if not matrix_path:
+        return []
+    source_matrix = yaml.safe_load(Path(matrix_path).read_text(encoding="utf-8"))
+    groups = set(matrix.get("stage1_1_frozen_groups", []))
+    if not groups:
+        raise ValueError("stage1_1_frozen_groups must not be empty.")
+    training_root = Path(source_matrix["workdir_root"]) / "training"
+    artifacts = []
+    for job in source_matrix["jobs"]:
+        if job.get("group") not in groups:
+            continue
+        run_dir = training_root / job["name"]
+        _assert_under(run_dir, training_root)
+        run_manifest_path = _require_file(run_dir / "run_manifest.json")
+        success_path = _require_file(run_dir / "job.success.json")
+        run_manifest = json.loads(run_manifest_path.read_text(encoding="utf-8"))
+        success = json.loads(success_path.read_text(encoding="utf-8"))
+        if run_manifest.get("status") != "complete" or success.get("returncode") != 0:
+            raise ValueError(f"Stage1.1 diagnostic run is not complete: {run_dir}")
+        expected_seed = int(job.get("seed", 2019))
+        if int(run_manifest.get("seed")) != expected_seed:
+            raise ValueError(f"Seed mismatch for Stage1.1 run {job['name']}.")
+        checkpoint = _require_file(
+            run_dir
+            / "checkpoints"
+            / job["dataset_id"]
+            / f"{job['expid']}.model"
+        )
+        prediction = _require_file(run_dir / "predictions" / f"{job['expid']}.csv")
+        prediction_info = _fingerprint(prediction, include_rows=True)
+        if prediction_info["rows"] != expected_rows:
+            raise ValueError(
+                f"Stage1.1 prediction rows for {job['name']} are "
+                f"{prediction_info['rows']}."
+            )
+        artifacts.append(
+            {
+                "job": job["name"],
+                "group": job["group"],
+                "seed": expected_seed,
+                "expid": job["expid"],
+                "dataset_id": job["dataset_id"],
+                "training_commit": run_manifest["git_commit"],
+                "config_hash": run_manifest["config_hash"],
+                "checkpoint": _fingerprint(checkpoint),
+                "prediction": prediction_info,
+                "hparams": _fingerprint(_require_file(run_dir / "hparams.json")),
+                "metrics": _fingerprint(_require_file(run_dir / "metrics.json")),
+                "run_manifest": _fingerprint(run_manifest_path),
+                "success_marker": _fingerprint(success_path),
+                "representation_manifests": _representation_manifest_fingerprints(
+                    run_dir
+                ),
+            }
+        )
+    if not artifacts:
+        raise ValueError("No Stage1.1 diagnostic runs matched the frozen groups.")
+    return artifacts
+
+
 def freeze_inputs(matrix_path: str | Path) -> dict:
     """Validate and fingerprint the complete existing M5A artifact matrix."""
 
@@ -146,6 +231,9 @@ def freeze_inputs(matrix_path: str | Path) -> dict:
     documents = {
         path: _fingerprint(_require_file(PROJECT_ROOT / path)) for path in REQUIRED_DOCS
     }
+    diagnostic_artifacts = _freeze_stage1_1_diagnostic_runs(
+        matrix, expected_prediction_rows
+    )
     return {
         "version": 1,
         "stage": "Stage1.2",
@@ -163,6 +251,8 @@ def freeze_inputs(matrix_path: str | Path) -> dict:
         },
         "artifact_count": len(artifacts),
         "artifacts": artifacts,
+        "stage1_1_diagnostic_artifact_count": len(diagnostic_artifacts),
+        "stage1_1_diagnostic_artifacts": diagnostic_artifacts,
         "data_files": data_files,
         "probe_sample_files": probe_files,
         "documents": documents,
@@ -178,6 +268,8 @@ def render_report(payload: dict) -> str:
         f"- Stage1.2 baseline commit: `{payload['stage1_2_baseline_commit']}`.",
         f"- M5A training commit: `{payload['m5a_training_commit']}`.",
         f"- Frozen M5A runs: `{payload['artifact_count']}`.",
+        "- Frozen M3/M4 diagnostic runs: "
+        f"`{payload['stage1_1_diagnostic_artifact_count']}`.",
         "- Frozen prediction rows per run: "
         f"`{payload['expected_prediction_rows']}`.",
         "- Position-corrected: `unavailable_missing_external_propensity`.",
