@@ -115,3 +115,7 @@ def test_stage1_2_matrix_reuses_all_m5a_checkpoints_and_predictions():
         assert command[command.index("--representation_out") + 1] == str(
             run_dir / "representations"
         )
+        assert command[command.index("--representation_row_ids") + 1] == matrix[
+            "probe_sample"
+        ]
+        assert "--representation_max_rows_per_split" not in command

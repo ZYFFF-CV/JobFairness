@@ -43,7 +43,9 @@ Stage1.2 用于定位 Stage1.1 公平干预失败发生在证据链的哪个环�
 
 状态：等待 M1A 通过后执行。
 
-对 18 个 checkpoint 使用同一抽样协议导出 train/valid/test 表征。每个 split 最多 200,000 行，抽样基准 seed 为 2019，split 偏移规则沿用 Stage1.1；完整导出在服务器前台串行运行并支持 `--resume`。
+对 18 个 checkpoint 导出 train/valid/test 表征。导出器直接读取 Stage1.1
+冻结的 `probe_rows.npz`，每个 split 使用完全相同的 50,000 个原始
+`row_id`；禁止重新按 seed 抽取一个规模相同但成员不同的样本。完整导出在服务器前台串行运行并支持 `--resume`。
 
 退出门槛：18 组表征的层名、维度、抽样 `row_id` 和元信息一致，且每组测试概率复核通过。
 

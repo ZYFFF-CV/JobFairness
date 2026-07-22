@@ -6,9 +6,19 @@ import pytest
 
 from fuxictr_ext.fairjob.representation_io import (
     RepresentationShardWriter,
+    selection_positions,
     validate_exported_predictions,
     validate_representation_directory,
 )
+
+
+def test_frozen_row_ids_map_to_ordered_source_positions():
+    positions = selection_positions(
+        np.array([10, 20, 30, 40]), np.array([10, 30, 40])
+    )
+    assert np.array_equal(positions, np.array([0, 2, 3]))
+    with pytest.raises(ValueError, match="missing"):
+        selection_positions(np.array([10, 20, 30]), np.array([10, 25]))
 
 
 def test_representation_writer_splits_and_validates(tmp_path: Path):

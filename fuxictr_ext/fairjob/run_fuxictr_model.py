@@ -34,6 +34,7 @@ from fuxictr_ext.fairjob.hparams import write_hparams
 from fuxictr_ext.fairjob.evaluator import evaluate_prediction_file, write_evaluation_outputs
 from fuxictr_ext.fairjob.models import FAIRJOB_MODELS, resolve_model_class
 from fuxictr_ext.fairjob.prediction_io import write_prediction_csv
+from fuxictr_ext.fairjob.prepare_probe_samples import load_probe_row_ids
 from fuxictr_ext.fairjob.representation_io import (
     export_representations,
     validate_exported_predictions,
@@ -83,6 +84,11 @@ def parse_args() -> argparse.Namespace:
         "--reference_prediction",
         default=None,
         help="Canonical test prediction used to verify checkpoint-only exports.",
+    )
+    parser.add_argument(
+        "--representation_row_ids",
+        default=None,
+        help="Frozen probe-row NPZ used instead of fresh export sampling.",
     )
     return parser.parse_args()
 
@@ -190,6 +196,11 @@ def export_requested_representations(model, feature_map, params: dict, args) -> 
     manifests = {}
     for split in ("train", "valid", "test"):
         if split in requested:
+            selected_row_ids = (
+                load_probe_row_ids(args.representation_row_ids, split)
+                if args.representation_row_ids
+                else None
+            )
             manifests[split] = export_representations(
                 model=model,
                 data_generator=generators[split],
@@ -197,9 +208,15 @@ def export_requested_representations(model, feature_map, params: dict, args) -> 
                 out_dir=args.representation_out,
                 split=split,
                 shard_rows=args.representation_shard_rows,
-                max_rows=args.representation_max_rows_per_split,
+                max_rows=(
+                    None
+                    if selected_row_ids is not None
+                    else args.representation_max_rows_per_split
+                ),
                 sample_seed=representation_seed
                 + {"train": 0, "valid": 1, "test": 2}[split],
+                selected_row_ids=selected_row_ids,
+                row_id_source=args.representation_row_ids,
             )
     return manifests
 

@@ -134,12 +134,21 @@ def command_for_job(
                 ),
                 "--representation_splits",
                 "train,valid,test",
-                "--representation_max_rows_per_split",
-                str(matrix.get("representation_max_rows_per_split", 200000)),
                 "--representation_seed",
                 str(matrix.get("representation_seed", 2019)),
             ]
         )
+        if matrix.get("probe_sample"):
+            command.extend(
+                ["--representation_row_ids", str(matrix["probe_sample"])]
+            )
+        else:
+            command.extend(
+                [
+                    "--representation_max_rows_per_split",
+                    str(matrix.get("representation_max_rows_per_split", 200000)),
+                ]
+            )
     elif dry_run:
         command.append("--dry_run")
     elif job.get("export_representations", False):

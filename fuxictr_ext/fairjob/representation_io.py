@@ -36,6 +36,28 @@ def _as_2d_float(name: str, value) -> np.ndarray:
     return array
 
 
+def selection_positions(
+    source_row_ids: np.ndarray, selected_row_ids: np.ndarray
+) -> np.ndarray:
+    """Map frozen raw row IDs to positions in an ordered split manifest."""
+
+    source_row_ids = np.asarray(source_row_ids, dtype=np.int64)
+    selected_row_ids = np.asarray(selected_row_ids, dtype=np.int64)
+    if source_row_ids.ndim != 1 or selected_row_ids.ndim != 1:
+        raise ValueError("Representation row IDs must be one-dimensional.")
+    if len(source_row_ids) > 1 and not np.all(np.diff(source_row_ids) > 0):
+        raise ValueError("Source representation row IDs must be strictly increasing.")
+    if len(selected_row_ids) > 1 and not np.all(np.diff(selected_row_ids) > 0):
+        raise ValueError("Selected representation row IDs must be strictly increasing.")
+    positions = np.searchsorted(source_row_ids, selected_row_ids)
+    valid = positions < len(source_row_ids)
+    if not np.all(valid) or not np.array_equal(
+        source_row_ids[positions[valid]], selected_row_ids[valid]
+    ):
+        raise ValueError("Frozen probe row IDs are missing from split metadata.")
+    return positions
+
+
 class RepresentationShardWriter:
     """Buffer aligned arrays and write deterministic NPZ shards."""
 
@@ -107,6 +129,8 @@ def export_representations(
     shard_rows: int = 10000,
     max_rows: int | None = None,
     sample_seed: int = 2019,
+    selected_row_ids: np.ndarray | None = None,
+    row_id_source: str | Path | None = None,
 ) -> dict:
     """Export one split while aligning every tensor to raw FairJob metadata."""
 
@@ -118,7 +142,13 @@ def export_representations(
     representation_shapes = None
     offset = 0
     selected_positions = None
-    if max_rows is not None and len(meta) > max_rows:
+    if selected_row_ids is not None:
+        if max_rows is not None:
+            raise ValueError("Use either max_rows or selected_row_ids, not both.")
+        selected_positions = selection_positions(
+            meta["row_id"].to_numpy(dtype=np.int64), selected_row_ids
+        )
+    elif max_rows is not None and len(meta) > max_rows:
         rng = np.random.default_rng(sample_seed)
         selected_positions = np.sort(rng.choice(len(meta), size=max_rows, replace=False))
     selected_offset = 0
@@ -169,7 +199,15 @@ def export_representations(
 
     if offset != len(meta):
         raise ValueError(f"Representation rows {offset} do not match metadata rows {len(meta)}.")
+    if selected_positions is not None and selected_offset != len(selected_positions):
+        raise ValueError("Not all selected representation rows were exported.")
     shards = writer.close()
+    if selected_row_ids is not None:
+        sampling_method = "frozen_row_ids"
+    elif selected_positions is not None:
+        sampling_method = "uniform_without_replacement"
+    else:
+        sampling_method = "all_rows"
     manifest = {
         "version": 1,
         "split": split,
@@ -177,9 +215,10 @@ def export_representations(
         "source_rows": offset,
         "meta_path": str(meta_path),
         "sampling": {
-            "method": "uniform_without_replacement" if selected_positions is not None else "all_rows",
+            "method": sampling_method,
             "max_rows": max_rows,
             "seed": sample_seed,
+            "row_id_source": str(row_id_source) if row_id_source else None,
         },
         "representation_shapes": representation_shapes or {},
         "shards": shards,
