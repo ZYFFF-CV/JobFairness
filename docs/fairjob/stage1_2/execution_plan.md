@@ -41,9 +41,7 @@ Stage1.2 用于定位 Stage1.1 公平干预失败发生在证据链的哪个环�
 
 ### M1B 完整矩阵导出
 
-状态：M1A 已通过；M1B 因服务器存储容量暂停。50,000 行单 split
-实测占用 1.4 GB，完整 18 × 3 矩阵约需 75.6 GB，当前数据盘仅剩约
-28 GB。未执行部分矩阵，也未删除 Stage1.1 产物。
+状态：已完成。经批准删除可由 checkpoint 重建的 Stage1.1 非对齐表征后，M1B 完成 18 组 × 3 split 导出。矩阵验收确认 54 个 split 均使用冻结的 50,000 个 `row_id`，最大 checkpoint 重算预测误差为 `1.1102230246251565e-16`，干预组件最大重构误差为 `0`。详见 `docs/fairjob/stage1_2/post_intervention_export_report.md`。
 
 对 18 个 checkpoint 导出 train/valid/test 表征。导出器直接读取 Stage1.1
 冻结的 `probe_rows.npz`，每个 split 使用完全相同的 50,000 个原始

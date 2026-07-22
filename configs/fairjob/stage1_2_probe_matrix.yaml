@@ -1,0 +1,25 @@
+version: 1
+workdir_root: /root/autodl-tmp/workdirs/JobFairness/stage1_2
+export_matrix: configs/fairjob/stage1_2_matrix.yaml
+probe_sample: /root/autodl-tmp/workdirs/JobFairness/stage1_1/probes/probe_rows.npz
+probe_seed: 2019
+max_rows_per_split: 50000
+linear_max_iter: 1000
+nonlinear_max_iter: 500
+nonlinear_early_stopping: true
+
+representations:
+  - embedding_flat
+  - cross_layer_0
+  - cross_layer_1
+  - cross_layer_2
+  - dcnv2_final_pre_mitigation
+  - dcnv2_final
+  - dcnv2_suppressed_component
+  - dcnv2_residual_component
+  - dcnv2_logit
+  - dcnv2_probability
+
+smoke:
+  job: baseline_seed2019
+  representation: dcnv2_probability

@@ -37,6 +37,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max_rows_per_split", type=int, default=200000)
     parser.add_argument("--seed", type=int, default=2019)
     parser.add_argument("--linear_max_iter", type=int, default=1000)
+    parser.add_argument("--nonlinear_max_iter", type=int, default=100)
+    parser.add_argument("--nonlinear_early_stopping", action="store_true")
     parser.add_argument(
         "--probe_sample",
         default=None,
@@ -140,7 +142,11 @@ def sample_representation(
 
 
 def candidate_models(
-    probe_type: str, seed: int, linear_max_iter: int = 1000
+    probe_type: str,
+    seed: int,
+    linear_max_iter: int = 1000,
+    nonlinear_max_iter: int = 100,
+    nonlinear_early_stopping: bool = False,
 ) -> list[tuple[str, dict, object]]:
     """Return the bounded probe grid used for validation-only selection."""
 
@@ -167,8 +173,9 @@ def candidate_models(
                     hidden_layer_sizes=hidden_units,
                     alpha=alpha,
                     batch_size=1024,
-                    max_iter=100,
-                    early_stopping=False,
+                    max_iter=nonlinear_max_iter,
+                    early_stopping=nonlinear_early_stopping,
+                    n_iter_no_change=20,
                     random_state=seed,
                 ),
             )
@@ -186,6 +193,8 @@ def fit_probe(
     probe_type: str,
     seed: int,
     linear_max_iter: int = 1000,
+    nonlinear_max_iter: int = 100,
+    nonlinear_early_stopping: bool = False,
 ) -> list[dict]:
     """Select one model per probe family on validation AUC and report test once."""
 
@@ -194,7 +203,11 @@ def fit_probe(
     for family in sorted(families):
         best = None
         for current_family, params, model in candidate_models(
-            probe_type, seed, linear_max_iter=linear_max_iter
+            probe_type,
+            seed,
+            linear_max_iter=linear_max_iter,
+            nonlinear_max_iter=nonlinear_max_iter,
+            nonlinear_early_stopping=nonlinear_early_stopping,
         ):
             if current_family != family:
                 continue
@@ -277,6 +290,8 @@ def main() -> None:
         args.probe_type,
         args.seed,
         linear_max_iter=args.linear_max_iter,
+        nonlinear_max_iter=args.nonlinear_max_iter,
+        nonlinear_early_stopping=args.nonlinear_early_stopping,
     )
     for probe in probes:
         add_amplification(probe, input_baseline_auc)
@@ -287,6 +302,8 @@ def main() -> None:
         "representation": args.representation,
         "seed": args.seed,
         "linear_max_iter": args.linear_max_iter,
+        "nonlinear_max_iter": args.nonlinear_max_iter,
+        "nonlinear_early_stopping": args.nonlinear_early_stopping,
         "probe_sample": args.probe_sample,
         "shard_validation": not args.skip_shard_validation,
         "input_baseline_result": args.input_baseline_result,
