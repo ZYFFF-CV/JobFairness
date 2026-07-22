@@ -1,0 +1,30 @@
+version: 1
+workdir_root: /root/autodl-tmp/workdirs/JobFairness/stage1_2
+checkpoint_workdir_root: /root/autodl-tmp/workdirs/JobFairness/stage1_1/m5
+config_dir: /root/autodl-tmp/workdirs/JobFairness/stage1_1/runtime_config
+data_dir: /root/autodl-tmp/datasets/FairJob/processed
+probe_sample: /root/autodl-tmp/workdirs/JobFairness/stage1_1/probes/probe_rows.npz
+gpu: 0
+representation_seed: 2019
+representation_max_rows_per_split: 200000
+expected_test_rows: 214446
+
+jobs:
+  - {name: baseline_seed2019, group: post_intervention_export, expid: M5DCNv2_baseline_full, dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full, seed: 2019}
+  - {name: baseline_seed2020, group: post_intervention_export, expid: M5DCNv2_baseline_full, dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full, seed: 2020}
+  - {name: baseline_seed2021, group: post_intervention_export, expid: M5DCNv2_baseline_full, dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full, seed: 2021}
+  - {name: global_suppression_seed2019, group: post_intervention_export, expid: M5DCNv2_global_suppression_full, dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full, seed: 2019}
+  - {name: global_suppression_seed2020, group: post_intervention_export, expid: M5DCNv2_global_suppression_full, dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full, seed: 2020}
+  - {name: global_suppression_seed2021, group: post_intervention_export, expid: M5DCNv2_global_suppression_full, dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full, seed: 2021}
+  - {name: matched_random_suppression_seed2019, group: post_intervention_export, expid: M5DCNv2_matched_random_suppression_full, dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full, seed: 2019}
+  - {name: matched_random_suppression_seed2020, group: post_intervention_export, expid: M5DCNv2_matched_random_suppression_full, dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full, seed: 2020}
+  - {name: matched_random_suppression_seed2021, group: post_intervention_export, expid: M5DCNv2_matched_random_suppression_full, dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full, seed: 2021}
+  - {name: selective_suppression_seed2019, group: post_intervention_export, expid: M5DCNv2_selective_suppression_full, dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full, seed: 2019}
+  - {name: selective_suppression_seed2020, group: post_intervention_export, expid: M5DCNv2_selective_suppression_full, dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full, seed: 2020}
+  - {name: selective_suppression_seed2021, group: post_intervention_export, expid: M5DCNv2_selective_suppression_full, dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full, seed: 2021}
+  - {name: dp_regularization_seed2019, group: post_intervention_export, expid: M5DCNv2_dp_regularization_full, dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full, seed: 2019}
+  - {name: dp_regularization_seed2020, group: post_intervention_export, expid: M5DCNv2_dp_regularization_full, dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full, seed: 2020}
+  - {name: dp_regularization_seed2021, group: post_intervention_export, expid: M5DCNv2_dp_regularization_full, dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full, seed: 2021}
+  - {name: adversarial_seed2019, group: post_intervention_export, expid: M5DCNv2_adversarial_full, dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full, seed: 2019}
+  - {name: adversarial_seed2020, group: post_intervention_export, expid: M5DCNv2_adversarial_full, dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full, seed: 2020}
+  - {name: adversarial_seed2021, group: post_intervention_export, expid: M5DCNv2_adversarial_full, dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full, seed: 2021}

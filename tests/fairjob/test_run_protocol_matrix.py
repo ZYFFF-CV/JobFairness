@@ -85,3 +85,28 @@ def test_m5a_matrix_is_six_methods_by_three_seeds():
         )
         assert "--seed" in command
         assert "--representation_out" not in command
+
+
+def test_stage1_2_matrix_reuses_all_m5a_checkpoints_and_predictions():
+    matrix = read_matrix(ROOT / "configs/fairjob/stage1_2_matrix.yaml")
+    jobs = select_jobs(matrix, "post_intervention_export")
+    assert len(jobs) == 18
+    assert {job["seed"] for job in jobs} == {2019, 2020, 2021}
+    for job in jobs:
+        command, run_dir = command_for_job(
+            job, matrix, dry_run=False, representations_only=True
+        )
+        source = (
+            Path(matrix["checkpoint_workdir_root"])
+            / "training"
+            / job["name"]
+        )
+        assert command[command.index("--model_root") + 1] == str(
+            source / "checkpoints"
+        )
+        assert command[command.index("--reference_prediction") + 1] == str(
+            source / "predictions" / f"{job['expid']}.csv"
+        )
+        assert command[command.index("--representation_out") + 1] == str(
+            run_dir / "representations"
+        )

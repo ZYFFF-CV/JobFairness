@@ -141,3 +141,27 @@ def test_fairness_baselines_backpropagate_without_meta_input_leakage(tmp_path):
         assert torch.isfinite(loss)
         loss.backward()
         assert model.fc.weight.grad is not None
+
+
+def test_mitigated_export_exposes_intervention_components_and_mask_metadata(
+    tmp_path,
+):
+    model = _model(tmp_path, "global_suppression")
+    diagnostic = model.forward_with_representations(_batch())
+    representations = diagnostic["representations"]
+    assert {
+        "dcnv2_final_pre_mitigation",
+        "dcnv2_suppressed_component",
+        "dcnv2_residual_component",
+        "dcnv2_probability",
+    }.issubset(representations)
+    assert torch.allclose(
+        representations["dcnv2_final_pre_mitigation"],
+        representations["dcnv2_suppressed_component"]
+        + representations["dcnv2_residual_component"],
+    )
+    assert torch.equal(representations["dcnv2_probability"], diagnostic["y_pred"])
+    metadata = model.representation_export_metadata()
+    assert metadata["mitigation_method"] == "global_suppression"
+    assert metadata["suppressed_dimensions"] == 16
+    assert len(metadata["suppression_mask_sha256"]) == 64

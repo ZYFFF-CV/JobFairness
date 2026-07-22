@@ -34,7 +34,10 @@ from fuxictr_ext.fairjob.hparams import write_hparams
 from fuxictr_ext.fairjob.evaluator import evaluate_prediction_file, write_evaluation_outputs
 from fuxictr_ext.fairjob.models import FAIRJOB_MODELS, resolve_model_class
 from fuxictr_ext.fairjob.prediction_io import write_prediction_csv
-from fuxictr_ext.fairjob.representation_io import export_representations
+from fuxictr_ext.fairjob.representation_io import (
+    export_representations,
+    validate_exported_predictions,
+)
 from fuxictr_ext.fairjob.run_manifest import (
     git_commit,
     runtime_versions,
@@ -75,6 +78,11 @@ def parse_args() -> argparse.Namespace:
         "--export_representations_only",
         action="store_true",
         help="Load the best checkpoint and export representations without retraining.",
+    )
+    parser.add_argument(
+        "--reference_prediction",
+        default=None,
+        help="Canonical test prediction used to verify checkpoint-only exports.",
     )
     return parser.parse_args()
 
@@ -214,6 +222,8 @@ def main() -> None:
         raise ValueError("--export_representations_only requires --representation_out.")
     if args.export_representations_only and args.dry_run:
         raise ValueError("Representation-only export cannot be combined with --dry_run.")
+    if args.reference_prediction and not args.export_representations_only:
+        raise ValueError("--reference_prediction requires --export_representations_only.")
     run_dir, prediction_out = configure_paths(args, params)
 
     set_logger(params)
@@ -275,6 +285,14 @@ def main() -> None:
         representation_manifests = export_requested_representations(
             model, feature_map, params, args
         )
+        prediction_check = None
+        if args.reference_prediction:
+            if "test" not in representation_manifests:
+                raise ValueError("Reference prediction validation requires test export.")
+            prediction_check = validate_exported_predictions(
+                Path(args.representation_out) / "test",
+                args.reference_prediction,
+            )
         manifest.update(
             {
                 "status": "representation_export_complete",
@@ -288,6 +306,7 @@ def main() -> None:
                     split: item["rows"]
                     for split, item in representation_manifests.items()
                 },
+                "reference_prediction_check": prediction_check,
             }
         )
         if manifest_path:

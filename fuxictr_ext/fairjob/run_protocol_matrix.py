@@ -1,4 +1,4 @@
-"""Run or detach an idempotent Stage1.1 FairJob experiment matrix.
+"""Run or detach an idempotent FairJob experiment matrix.
 
 The detached mode starts a new server-side process session with logs redirected
 to the Stage1.1 workdir. Completed jobs receive a success marker and are skipped
@@ -79,7 +79,13 @@ def command_for_job(
 
     expid = job["expid"]
     dataset_id = job["dataset_id"]
-    phase = "dry_run" if dry_run else "training"
+    phase = (
+        "dry_run"
+        if dry_run
+        else "representation_exports"
+        if representations_only
+        else "training"
+    )
     if dry_run and representations_only:
         raise ValueError("Representation-only export cannot be a dry run.")
     if dry_run:
@@ -103,15 +109,33 @@ def command_for_job(
         str(run_dir),
     ]
     if representations_only:
+        checkpoint_root = matrix.get("checkpoint_workdir_root")
+        if checkpoint_root:
+            source_run_dir = Path(checkpoint_root) / "training" / job["name"]
+            command.extend(
+                [
+                    "--model_root",
+                    str(source_run_dir / "checkpoints"),
+                    "--reference_prediction",
+                    str(source_run_dir / "predictions" / f"{expid}.csv"),
+                ]
+            )
         command.extend(
             [
                 "--export_representations_only",
                 "--representation_out",
-                str(run_dir / "representations_aligned"),
+                str(
+                    run_dir
+                    / (
+                        "representations"
+                        if checkpoint_root
+                        else "representations_aligned"
+                    )
+                ),
                 "--representation_splits",
                 "train,valid,test",
                 "--representation_max_rows_per_split",
-                "200000",
+                str(matrix.get("representation_max_rows_per_split", 200000)),
                 "--representation_seed",
                 str(matrix.get("representation_seed", 2019)),
             ]

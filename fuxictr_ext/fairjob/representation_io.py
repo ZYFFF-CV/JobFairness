@@ -184,11 +184,67 @@ def export_representations(
         "representation_shapes": representation_shapes or {},
         "shards": shards,
     }
+    metadata_fn = getattr(model, "representation_export_metadata", None)
+    if metadata_fn is not None:
+        manifest["model_representation_metadata"] = metadata_fn()
     manifest_path = Path(out_dir) / split / "manifest.json"
     manifest_path.write_text(
         json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
     return manifest
+
+
+def validate_exported_predictions(
+    split_dir: str | Path,
+    reference_prediction: str | Path,
+    tolerance: float = 1e-6,
+) -> dict:
+    """Compare sampled exported probabilities with a canonical prediction CSV.
+
+    Stage1.2 reuses completed checkpoints. This check makes checkpoint loading,
+    feature preprocessing, and representation hooks auditable by requiring the
+    exported test probabilities to reproduce the original M5A predictions on
+    exactly the exported row IDs.
+    """
+
+    if tolerance < 0:
+        raise ValueError("Prediction tolerance must be non-negative.")
+    split_dir = Path(split_dir)
+    manifest = validate_representation_directory(split_dir)
+    row_ids = []
+    y_true = []
+    y_pred = []
+    for shard_info in manifest["shards"]:
+        with np.load(split_dir / shard_info["path"]) as shard:
+            row_ids.append(np.asarray(shard["row_id"], dtype=np.int64))
+            y_true.append(np.asarray(shard["y_true"], dtype=np.float64))
+            y_pred.append(np.asarray(shard["y_pred"], dtype=np.float64))
+    exported_row_ids = np.concatenate(row_ids) if row_ids else np.empty(0, dtype=np.int64)
+    exported_y_true = np.concatenate(y_true) if y_true else np.empty(0, dtype=np.float64)
+    exported_y_pred = np.concatenate(y_pred) if y_pred else np.empty(0, dtype=np.float64)
+
+    reference = pd.read_csv(reference_prediction, usecols=["row_id", "y_true", "y_pred"])
+    if reference["row_id"].duplicated().any():
+        raise ValueError("Reference prediction contains duplicate row IDs.")
+    aligned = reference.set_index("row_id").reindex(exported_row_ids)
+    if aligned.isna().any().any():
+        raise ValueError("Exported row IDs are missing from the reference prediction.")
+    reference_y_true = aligned["y_true"].to_numpy(dtype=np.float64)
+    reference_y_pred = aligned["y_pred"].to_numpy(dtype=np.float64)
+    if not np.array_equal(exported_y_true, reference_y_true):
+        raise ValueError("Exported labels differ from the reference prediction.")
+    differences = np.abs(exported_y_pred - reference_y_pred)
+    max_abs_diff = float(differences.max()) if len(differences) else 0.0
+    if max_abs_diff > tolerance:
+        raise ValueError(
+            f"Representation export changed predictions: max_abs_diff={max_abs_diff}"
+        )
+    return {
+        "rows": int(len(exported_row_ids)),
+        "reference_prediction": str(reference_prediction),
+        "tolerance": tolerance,
+        "max_abs_prediction_diff": max_abs_diff,
+    }
 
 
 def validate_representation_directory(path: str | Path) -> dict:

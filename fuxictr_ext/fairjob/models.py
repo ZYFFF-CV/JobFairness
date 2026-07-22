@@ -8,6 +8,7 @@ to the corresponding FuxiCTR model-zoo class.
 
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -255,8 +256,26 @@ class FairJobMitigatedDCNv2(FairJobDCNv2):
         diagnostic["y_pred"] = self.output_activation(logit)
         diagnostic["representations"]["dcnv2_final_pre_mitigation"] = pre_mitigation
         diagnostic["representations"]["dcnv2_final"] = final_out
+        diagnostic["representations"]["dcnv2_suppressed_component"] = (
+            pre_mitigation - final_out
+        )
+        diagnostic["representations"]["dcnv2_residual_component"] = final_out
         diagnostic["representations"]["dcnv2_logit"] = logit
+        diagnostic["representations"]["dcnv2_probability"] = diagnostic["y_pred"]
         return diagnostic
+
+    def representation_export_metadata(self) -> dict:
+        """Describe the fixed M5 intervention without repeating masks per row."""
+
+        mask = self.suppression_mask.detach().cpu().numpy()
+        return {
+            "mitigation_method": self.mitigation_method,
+            "training_seed": self.training_seed,
+            "final_dimensions": int(mask.size),
+            "suppressed_dimensions": int((mask == 0).sum()),
+            "suppressed_indices": [int(index) for index in self.suppressed_indices],
+            "suppression_mask_sha256": hashlib.sha256(mask.tobytes()).hexdigest(),
+        }
 
     def forward(self, inputs):
         """Return native click prediction plus method-specific training terms."""
