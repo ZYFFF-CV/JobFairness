@@ -2,17 +2,18 @@
 
 ## 运行结论
 
-S12-M1A 已在服务器单卡 RTX 4090 D 上完成。运行仅加载 Stage1.1 M5A 的 `baseline_seed2019` checkpoint，不重新训练、不更新权重，导出 test split 中按固定 seed 抽样的 2,048 行。
+S12-M1A 已在服务器单卡 RTX 4090 D 上完成。运行仅加载 Stage1.1 M5A 的 `baseline_seed2019` checkpoint，不重新训练、不更新权重。初始 2,048 行 smoke 通过后，进一步直接读取 Stage1.1 冻结的 `probe_rows.npz`，导出了 test split 中全部 50,000 个指定原始 `row_id`，没有重新随机抽样。
 
 | 项目 | 结果 |
 |---|---|
-| Stage1.2 代码 commit | `454c26ffaa875f805afa1d35af9a5e5b91e54b49` |
+| Stage1.2 代码 commit | `f44a9f6d5eaa091ca0477b7fe0ab7d1f8c55f615` |
 | M5A checkpoint | `baseline_seed2019` / `M5DCNv2_baseline_full` |
 | Dataset | `fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full` |
 | Representation sampling seed | `2019` |
-| 导出 split / 行数 | test / 2,048 |
+| 导出 split / 行数 | test / 50,000 frozen row IDs |
 | 原预测一致性阈值 | `1e-6` |
-| 最大预测绝对误差 | `9.974659986866641e-17` |
+| 最大预测绝对误差 | `9.999054535747565e-17` |
+| 50,000 行单 split 实测占用 | `1.4 GB` |
 | 状态 | `representation_export_complete` |
 
 ## 表征层
@@ -51,3 +52,5 @@ S12-M1A 已在服务器单卡 RTX 4090 D 上完成。运行仅加载 Stage1.1 M5
 ## 门槛判断
 
 M1A 通过。checkpoint-only 导出保持原预测，要求的表征层与干预组件完整，允许进入 M1B 的 18 组统一导出。M1B 仍是只读 GPU/I/O 操作，不属于新训练。
+
+容量审计显示，18 组乘 3 个 split 按实测约需 75.6 GB，而服务器数据盘在本次 smoke 后仅剩约 28 GB。M1B 因存储容量暂停，未进行部分矩阵导出，也未删除任何 Stage1.1 产物。
