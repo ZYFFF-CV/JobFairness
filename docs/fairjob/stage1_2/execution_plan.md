@@ -14,7 +14,9 @@ Stage1.2 用于定位 Stage1.1 公平干预失败发生在证据链的哪个环�
 
 ## S12-M0：冻结 Stage1.1 证据
 
-状态：实现完成，等待服务器生成正式冻结清单。
+状态：已完成。正式清单位于服务器
+`stage1_2/manifests/stage1_1_closure.json`，可读报告同步为
+`docs/fairjob/stage1_2/stage1_1_closure.md`。
 
 1. 校验六种方法乘三个种子的 checkpoint、prediction、hparams、metrics、run manifest 和 success marker 完整。
 2. 从原始 run manifest 恢复 M5A 训练 commit、seed、config hash 和运行环境，不进行人工猜测。
@@ -27,7 +29,8 @@ Stage1.2 用于定位 Stage1.1 公平干预失败发生在证据链的哪个环�
 
 ### M1A 导出链路验证
 
-状态：代码与本地测试完成，等待服务器单 checkpoint smoke。
+状态：已完成。`baseline_seed2019` 的 2,048 行 test smoke 已通过，详见
+`docs/fairjob/stage1_2/post_intervention_export_smoke.md`。
 
 1. 直接加载 M5A checkpoint，不重新训练。
 2. 导出 `embedding_flat`、`cross_layer_0/1/2`、`dcnv2_final_pre_mitigation`、`dcnv2_final`、`dcnv2_suppressed_component`、`dcnv2_residual_component`、`dcnv2_logit` 和 `dcnv2_probability`。
