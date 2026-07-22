@@ -1,8 +1,9 @@
 # Stage1.1 closure for Stage1.2
 
-- Stage1.2 baseline commit: `454c26ffaa875f805afa1d35af9a5e5b91e54b49`.
+- Stage1.2 baseline commit: `c1fa6cec2e46cee1e68568e289b21a9a7bedbf95`.
 - M5A training commit: `1799a6f072a7d51fb26af7e5b0ce24be8d615bb0`.
 - Frozen M5A runs: `18`.
+- Frozen M3/M4 diagnostic runs: `14`.
 - Frozen prediction rows per run: `214446`.
 - Position-corrected: `unavailable_missing_external_propensity`.
 
