@@ -123,13 +123,11 @@ Run a bounded baseline/primary checkpoint pair first:
   --methods baseline multi_layer_path_gate_full
 ```
 
-After the bounded pair confirms runtime and memory use, run or resume all 27
-audits:
-
-```bash
-/root/autodl-tmp/workdirs/JobFairness/venv/bin/python -u \
-  fuxictr_ext/fairjob/run_stage2_probe_matrix.py
-```
+The bounded pair completed on 2026-07-23 and triggered the frozen early-stop
+rule. Multiple primary target nodes have material positive maximum-family probe
+deltas in seed 2019, so the required all-seed negative direction cannot be
+recovered. Do not run the remaining 25 checkpoint audits. The decision and
+evidence are archived in `p3_seed2019_early_stop_audit.md`.
 
 The process remains in the foreground and prints split reconstruction plus
 target/protocol progress. Reruns skip only complete results produced by the
