@@ -51,7 +51,7 @@ Stage1.2 用于定位 Stage1.1 公平干预失败发生在证据链的哪个环�
 
 ## S12-M2：冻结 Probe 与泄漏迁移审计
 
-状态：等待 M1B。
+状态：已完成。180 个 checkpoint-layer 组合产生 360 个线性/非线性结果；68 个初始未收敛线性 probe 经 3,000 次上限重试后全部收敛。结论为 global/selective/adversarial 发生 leakage redistribution，matched-random 为 probe-family disagreement，DP regularization 未降低 leakage。详见 `docs/fairjob/stage1_2/post_intervention_leakage_report.md`。
 
 1. 复用冻结 probe 行集合，禁止按方法重新抽样。
 2. 每个方法、seed、层分别运行线性 probe 和等容量非线性 probe。
@@ -66,7 +66,7 @@ Stage1.2 用于定位 Stage1.1 公平干预失败发生在证据链的哪个环�
 
 ### Tier 1：不训练诊断
 
-状态：等待 M2。
+状态：进行中。M2 已允许无训练的 collapse 与 calibration 归因，但未批准 Tier 2 新训练。
 
 使用现有预测和导出表征检查 prediction/logit 均值、标准差、分位数、熵、动态范围、正负样本分数间隔、AUC、NLLH、Brier、ECE 和 DP 的联合变化。优先判断 adversarial 的低 DP 是否来自预测坍缩，并用 validation-only temperature scaling、beta calibration 或 isotonic calibration 判断 NLLH/ECE 改善是否可由后处理复现。
 
