@@ -62,10 +62,36 @@ and memory use. They are not pilot evidence.
 
 ## Formal Pilot Boundary
 
-Do not start the three-seed full matrix until P1 smoke passes. For every seed,
-train `Stage2DCNv2_baseline_full` first, then pass its exact checkpoint to all
-eight paired methods with `--backbone_checkpoint`. Full configs reject a
-non-baseline run when that checkpoint is absent.
+P1 smoke passed and the three-seed P2 matrix was approved on 2026-07-23. Start
+the foreground, resumable scheduler from the cloud provider's server console:
+
+```bash
+cd /root/autodl-tmp/code/JobFairness
+/root/autodl-tmp/workdirs/JobFairness/venv/bin/python -u \
+  fuxictr_ext/fairjob/run_stage2_pilot.py
+```
+
+The default invocation runs all 27 jobs in frozen order. For each seed it
+trains `Stage2DCNv2_baseline_full` first, then passes that exact checkpoint to
+the eight dependent methods. A rerun skips only jobs whose manifest is
+complete and whose Git commit matches the current checkout.
+
+To inspect the exact command sequence without training:
+
+```bash
+/root/autodl-tmp/workdirs/JobFairness/venv/bin/python -u \
+  fuxictr_ext/fairjob/run_stage2_pilot.py --dry_run
+```
+
+To run one seed at a time:
+
+```bash
+/root/autodl-tmp/workdirs/JobFairness/venv/bin/python -u \
+  fuxictr_ext/fairjob/run_stage2_pilot.py --seeds 2019
+```
+
+Repeat with `2020` and `2021`. This remains foreground execution: logs are
+visible in the server console and no daemon or background process is created.
 
 The formal pilot is evaluated only by
 `configs/fairjob/stage2_pilot_gate.yaml`. Test metrics must not be used to
