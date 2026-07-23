@@ -1,0 +1,52 @@
+version: 1
+research_scope: behavioral_protected_proxy_decodability
+processed_dir: /root/autodl-tmp/datasets/FairJob/processed
+row_disjoint_sample: /root/autodl-tmp/workdirs/JobFairness/stage1_1/probes/probe_rows.npz
+user_disjoint_sample: /root/autodl-tmp/workdirs/JobFairness/stage2/manifests/user_disjoint_probe_rows.npz
+
+identity_sources:
+  train: train.csv
+  valid: valid.csv
+  test: test.csv
+
+user_assignment:
+  method: blake2b_stable_hash
+  seed: 2019
+  ratios:
+    train: 0.6
+    valid: 0.2
+    test: 0.2
+
+probe_families:
+  linear:
+    estimator: logistic_regression
+    C: [0.1, 1.0]
+    max_iter: 3000
+  matched_capacity_nonlinear:
+    estimator: mlp
+    hidden_layer_sizes: [[64]]
+    alpha: [0.0001, 0.001]
+    max_iter: 500
+    early_stopping: true
+  independent_bounded:
+    estimator: extra_trees
+    n_estimators: 100
+    max_depth: [6, 10]
+    min_samples_leaf: 20
+    n_jobs: 1
+
+selection:
+  capacity_and_orientation: validation_only
+  test_reads: one_per_selected_family
+  metric: roc_auc
+
+joint_paths:
+  - cross_dnn_outputs
+  - cross_block_increments
+  - branch_outputs_with_fusion
+
+material_effect_threshold: 0.005
+claim_boundary:
+  - probe_family_guardedness_not_information_erasure
+  - raw_user_id_only_for_user_disjoint_assignment
+  - test_not_used_for_probe_selection

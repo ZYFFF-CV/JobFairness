@@ -1,0 +1,60 @@
+version: 1
+research_scope: behavioral_protected_proxy_decodability
+
+training_adversary:
+  node_names:
+    - cross_layer_0
+    - cross_layer_1
+    - cross_layer_2
+    - parallel_dnn_path_output
+    - fusion_pre_logit
+  joint_paths:
+    - cross_dnn_outputs
+  hidden_units: [64]
+  activation: ReLU
+  balanced_loss: group_mean_binary_cross_entropy
+  gradient_reversal_scale: 1.0
+  inference_proxy_dependency: false
+
+graph_risk:
+  primary_mode: smooth_max_proxy_advantage
+  equivalent_adversary_loss: normalized_soft_min_bce
+  temperature: 0.05
+  ablations:
+    - mean_bce
+  conditional_formal_ablations:
+    - cvar_low_bce
+    - adaptive_dual
+  cvar_fraction: 0.25
+
+task_preservation:
+  ctr_label_loss: true
+  teacher:
+    source: same_seed_trained_baseline_checkpoint
+    frozen: true
+    required_for_formal_pilot: true
+    optional_for_dry_run_and_bounded_smoke: true
+  centered_logit_distillation:
+    enabled: true
+    weight: 0.05
+  pairwise_ranking:
+    enabled: true
+    weight: 0.05
+  exact_probability_distillation: false
+
+telemetry:
+  - node_balanced_bce
+  - node_proxy_advantage
+  - worst_node
+  - graph_risk
+  - centered_logit_loss
+  - pairwise_ranking_loss
+  - score_mean
+  - score_std
+  - logit_dynamic_range
+  - class_score_gap
+
+claim_boundary:
+  - train_time_proxy_supervision_only
+  - no_proxy_at_inference
+  - post_hoc_probe_required_for_containment_claim

@@ -8,7 +8,12 @@ from pathlib import Path
 import yaml
 
 
-GENERATED_PREFIXES = ("DeepFM_fairjob_", "DCNv2_fairjob_", "M5DCNv2_")
+GENERATED_PREFIXES = (
+    "DeepFM_fairjob_",
+    "DCNv2_fairjob_",
+    "M5DCNv2_",
+    "Stage2DCNv2_",
+)
 PRIMARY_PROTOCOLS = ("pre_ranking", "post_display")
 IDENTITY_CONTROL_PROTOCOLS = (
     "pre_ranking_no_user_id",
@@ -22,6 +27,17 @@ M5_METHODS = (
     "selective_suppression",
     "dp_regularization",
     "adversarial",
+)
+STAGE2_METHODS = (
+    "baseline",
+    "final_only_no_gate",
+    "multi_layer_no_gate",
+    "final_only_path_gate",
+    "multi_layer_path_gate_full",
+    "full_without_joint_adversary",
+    "layer_risk_sum",
+    "structured_random_gate",
+    "matched_capacity_regularization",
 )
 
 
@@ -120,6 +136,52 @@ def generate_entries() -> dict[str, dict]:
                     "adversarial_weight": 0.1,
                     "adversary_hidden_units": 64,
                     "gradient_reversal_scale": 1.0,
+                }
+            )
+            entries[expid] = config
+    stage2_dataset_prefix = "fairjob_m5_pre_ranking_no_user_id_proxy_excluded"
+    for method in STAGE2_METHODS:
+        for mode in ("smoke", "full"):
+            dataset_id = f"{stage2_dataset_prefix}_{mode}"
+            expid = f"Stage2DCNv2_{method}_{mode}"
+            config = model_config("DCNv2", dataset_id, mode)
+            config.update(
+                {
+                    "model": "FairJobGraphContainmentDCNv2",
+                    "stage2_method": method,
+                    "stage2_representation_graph": (
+                        "configs/fairjob/stage2_representation_graph.yaml"
+                    ),
+                    "stage2_adversary_nodes": [
+                        "cross_layer_0",
+                        "cross_layer_1",
+                        "cross_layer_2",
+                        "parallel_dnn_path_output",
+                        "fusion_pre_logit",
+                    ],
+                    "stage2_joint_paths": {
+                        "cross_dnn_outputs": [
+                            "cross_layer_2",
+                            "parallel_dnn_path_output",
+                        ]
+                    },
+                    "stage2_adversary_hidden_units": [64],
+                    "stage2_adversarial_weight": 0.1,
+                    "stage2_gradient_reversal_scale": 1.0,
+                    "stage2_graph_risk_mode": "smooth_max_proxy_advantage",
+                    "stage2_graph_risk_temperature": 0.05,
+                    "stage2_cvar_fraction": 0.25,
+                    "stage2_gate_budget": 0.1,
+                    "stage2_gate_minimum_keep": 0.5,
+                    "stage2_gate_temperature": 1.0,
+                    "stage2_gate_seed_offset": 200003,
+                    "stage2_centered_logit_weight": 0.05,
+                    "stage2_pairwise_ranking_weight": 0.05,
+                    "stage2_pairwise_margin": 0.05,
+                    "stage2_log_interval": 10 if mode == "smoke" else 50,
+                    "stage2_require_baseline_teacher": (
+                        mode == "full" and method != "baseline"
+                    ),
                 }
             )
             entries[expid] = config

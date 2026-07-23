@@ -35,6 +35,10 @@ from fuxictr_ext.fairjob.evaluator import evaluate_prediction_file, write_evalua
 from fuxictr_ext.fairjob.models import FAIRJOB_MODELS, resolve_model_class
 from fuxictr_ext.fairjob.prediction_io import write_prediction_csv
 from fuxictr_ext.fairjob.prepare_probe_samples import load_probe_row_ids
+from fuxictr_ext.fairjob.representation_graph import (
+    load_representation_graph,
+    validate_graph_representations,
+)
 from fuxictr_ext.fairjob.representation_io import (
     export_representations,
     validate_exported_predictions,
@@ -60,6 +64,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--metrics_out", default=None)
     parser.add_argument("--run_dir", default=None)
     parser.add_argument("--model_root", default=None)
+    parser.add_argument(
+        "--backbone_checkpoint",
+        default=None,
+        help="Same-seed trained baseline used to initialize and freeze a Stage2 teacher.",
+    )
     parser.add_argument("--dry_run", action="store_true")
     parser.add_argument("--representation_out", default=None)
     parser.add_argument(
@@ -136,7 +145,7 @@ def configure_paths(args: argparse.Namespace, params: dict) -> tuple[Path | None
     return run_dir, prediction_out
 
 
-def validate_forward_adapter(model, batch_data) -> dict:
+def validate_forward_adapter(model, batch_data, graph_path=None) -> dict:
     """Check that representation export reproduces native model probabilities."""
 
     if not hasattr(model, "forward_with_representations"):
@@ -157,12 +166,18 @@ def validate_forward_adapter(model, batch_data) -> dict:
         name: list(value.shape)
         for name, value in diagnostic["representations"].items()
     }
-    model.train(was_training)
-    return {
+    result = {
         "rows": int(len(native)),
         "max_abs_prediction_diff": max_abs_diff,
         "representation_shapes": shapes,
     }
+    if graph_path:
+        graph = load_representation_graph(graph_path)
+        result["representation_graph_audit"] = validate_graph_representations(
+            diagnostic["representations"], graph
+        )
+    model.train(was_training)
+    return result
 
 
 def export_requested_representations(model, feature_map, params: dict, args) -> dict:
@@ -235,6 +250,8 @@ def main() -> None:
         params["seed"] = args.seed
     if args.epochs is not None:
         params["epochs"] = args.epochs
+    if args.backbone_checkpoint is not None:
+        params["stage2_backbone_checkpoint"] = args.backbone_checkpoint
     if args.export_representations_only and not args.representation_out:
         raise ValueError("--export_representations_only requires --representation_out.")
     if args.export_representations_only and args.dry_run:
@@ -273,6 +290,9 @@ def main() -> None:
         "seed": params["seed"],
         "gpu": args.gpu,
     }
+    metadata_fn = getattr(model, "representation_export_metadata", None)
+    if metadata_fn is not None:
+        manifest["model_representation_metadata"] = metadata_fn()
     manifest_name = (
         "representation_export_manifest.json"
         if args.export_representations_only
@@ -287,7 +307,9 @@ def main() -> None:
         if not Path(model.checkpoint).exists():
             raise FileNotFoundError(f"Model checkpoint not found: {model.checkpoint}")
         model.load_weights(model.checkpoint)
-    forward_check = validate_forward_adapter(model, first_batch)
+    forward_check = validate_forward_adapter(
+        model, first_batch, params.get("stage2_representation_graph")
+    )
     logging.info("Forward adapter check: " + print_to_json(forward_check))
     if args.dry_run:
         manifest.update({"status": "dry_run_complete", "forward_check": forward_check})
@@ -344,7 +366,9 @@ def main() -> None:
     y_pred = model.predict(test_gen)
     model_name, regime, mode, protocol = infer_model_regime_mode(args.expid, params)
     hparams_source = (
-        "stage1_1_m5a_fixed"
+        "stage2_frozen_ablation"
+        if params.get("stage2_method")
+        else "stage1_1_m5a_fixed"
         if params.get("mitigation_method")
         else "stage1_1_fixed_screening"
     )
@@ -397,6 +421,25 @@ def main() -> None:
             "adversarial_weight",
             "adversary_hidden_units",
             "gradient_reversal_scale",
+            "stage2_method",
+            "stage2_representation_graph",
+            "stage2_adversary_nodes",
+            "stage2_joint_paths",
+            "stage2_adversary_hidden_units",
+            "stage2_adversarial_weight",
+            "stage2_gradient_reversal_scale",
+            "stage2_graph_risk_mode",
+            "stage2_graph_risk_temperature",
+            "stage2_cvar_fraction",
+            "stage2_gate_budget",
+            "stage2_gate_minimum_keep",
+            "stage2_gate_temperature",
+            "stage2_gate_seed_offset",
+            "stage2_centered_logit_weight",
+            "stage2_pairwise_ranking_weight",
+            "stage2_pairwise_margin",
+            "stage2_backbone_checkpoint",
+            "stage2_require_baseline_teacher",
         )
         if key in params
     }

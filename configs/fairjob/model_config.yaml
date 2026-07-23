@@ -1397,3 +1397,1101 @@ M5DCNv2_adversarial_full:
   adversarial_weight: 0.1
   adversary_hidden_units: 64
   gradient_reversal_scale: 1.0
+Stage2DCNv2_baseline_smoke:
+  model: FairJobGraphContainmentDCNv2
+  dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_smoke
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 1024
+  embedding_dim: 16
+  epochs: 1
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+  stage2_method: baseline
+  stage2_representation_graph: configs/fairjob/stage2_representation_graph.yaml
+  stage2_adversary_nodes:
+  - cross_layer_0
+  - cross_layer_1
+  - cross_layer_2
+  - parallel_dnn_path_output
+  - fusion_pre_logit
+  stage2_joint_paths:
+    cross_dnn_outputs:
+    - cross_layer_2
+    - parallel_dnn_path_output
+  stage2_adversary_hidden_units:
+  - 64
+  stage2_adversarial_weight: 0.1
+  stage2_gradient_reversal_scale: 1.0
+  stage2_graph_risk_mode: smooth_max_proxy_advantage
+  stage2_graph_risk_temperature: 0.05
+  stage2_cvar_fraction: 0.25
+  stage2_gate_budget: 0.1
+  stage2_gate_minimum_keep: 0.5
+  stage2_gate_temperature: 1.0
+  stage2_gate_seed_offset: 200003
+  stage2_centered_logit_weight: 0.05
+  stage2_pairwise_ranking_weight: 0.05
+  stage2_pairwise_margin: 0.05
+  stage2_log_interval: 10
+  stage2_require_baseline_teacher: false
+Stage2DCNv2_baseline_full:
+  model: FairJobGraphContainmentDCNv2
+  dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 4096
+  embedding_dim: 16
+  epochs: 20
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+  stage2_method: baseline
+  stage2_representation_graph: configs/fairjob/stage2_representation_graph.yaml
+  stage2_adversary_nodes:
+  - cross_layer_0
+  - cross_layer_1
+  - cross_layer_2
+  - parallel_dnn_path_output
+  - fusion_pre_logit
+  stage2_joint_paths:
+    cross_dnn_outputs:
+    - cross_layer_2
+    - parallel_dnn_path_output
+  stage2_adversary_hidden_units:
+  - 64
+  stage2_adversarial_weight: 0.1
+  stage2_gradient_reversal_scale: 1.0
+  stage2_graph_risk_mode: smooth_max_proxy_advantage
+  stage2_graph_risk_temperature: 0.05
+  stage2_cvar_fraction: 0.25
+  stage2_gate_budget: 0.1
+  stage2_gate_minimum_keep: 0.5
+  stage2_gate_temperature: 1.0
+  stage2_gate_seed_offset: 200003
+  stage2_centered_logit_weight: 0.05
+  stage2_pairwise_ranking_weight: 0.05
+  stage2_pairwise_margin: 0.05
+  stage2_log_interval: 50
+  stage2_require_baseline_teacher: false
+Stage2DCNv2_final_only_no_gate_smoke:
+  model: FairJobGraphContainmentDCNv2
+  dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_smoke
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 1024
+  embedding_dim: 16
+  epochs: 1
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+  stage2_method: final_only_no_gate
+  stage2_representation_graph: configs/fairjob/stage2_representation_graph.yaml
+  stage2_adversary_nodes:
+  - cross_layer_0
+  - cross_layer_1
+  - cross_layer_2
+  - parallel_dnn_path_output
+  - fusion_pre_logit
+  stage2_joint_paths:
+    cross_dnn_outputs:
+    - cross_layer_2
+    - parallel_dnn_path_output
+  stage2_adversary_hidden_units:
+  - 64
+  stage2_adversarial_weight: 0.1
+  stage2_gradient_reversal_scale: 1.0
+  stage2_graph_risk_mode: smooth_max_proxy_advantage
+  stage2_graph_risk_temperature: 0.05
+  stage2_cvar_fraction: 0.25
+  stage2_gate_budget: 0.1
+  stage2_gate_minimum_keep: 0.5
+  stage2_gate_temperature: 1.0
+  stage2_gate_seed_offset: 200003
+  stage2_centered_logit_weight: 0.05
+  stage2_pairwise_ranking_weight: 0.05
+  stage2_pairwise_margin: 0.05
+  stage2_log_interval: 10
+  stage2_require_baseline_teacher: false
+Stage2DCNv2_final_only_no_gate_full:
+  model: FairJobGraphContainmentDCNv2
+  dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 4096
+  embedding_dim: 16
+  epochs: 20
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+  stage2_method: final_only_no_gate
+  stage2_representation_graph: configs/fairjob/stage2_representation_graph.yaml
+  stage2_adversary_nodes:
+  - cross_layer_0
+  - cross_layer_1
+  - cross_layer_2
+  - parallel_dnn_path_output
+  - fusion_pre_logit
+  stage2_joint_paths:
+    cross_dnn_outputs:
+    - cross_layer_2
+    - parallel_dnn_path_output
+  stage2_adversary_hidden_units:
+  - 64
+  stage2_adversarial_weight: 0.1
+  stage2_gradient_reversal_scale: 1.0
+  stage2_graph_risk_mode: smooth_max_proxy_advantage
+  stage2_graph_risk_temperature: 0.05
+  stage2_cvar_fraction: 0.25
+  stage2_gate_budget: 0.1
+  stage2_gate_minimum_keep: 0.5
+  stage2_gate_temperature: 1.0
+  stage2_gate_seed_offset: 200003
+  stage2_centered_logit_weight: 0.05
+  stage2_pairwise_ranking_weight: 0.05
+  stage2_pairwise_margin: 0.05
+  stage2_log_interval: 50
+  stage2_require_baseline_teacher: true
+Stage2DCNv2_multi_layer_no_gate_smoke:
+  model: FairJobGraphContainmentDCNv2
+  dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_smoke
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 1024
+  embedding_dim: 16
+  epochs: 1
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+  stage2_method: multi_layer_no_gate
+  stage2_representation_graph: configs/fairjob/stage2_representation_graph.yaml
+  stage2_adversary_nodes:
+  - cross_layer_0
+  - cross_layer_1
+  - cross_layer_2
+  - parallel_dnn_path_output
+  - fusion_pre_logit
+  stage2_joint_paths:
+    cross_dnn_outputs:
+    - cross_layer_2
+    - parallel_dnn_path_output
+  stage2_adversary_hidden_units:
+  - 64
+  stage2_adversarial_weight: 0.1
+  stage2_gradient_reversal_scale: 1.0
+  stage2_graph_risk_mode: smooth_max_proxy_advantage
+  stage2_graph_risk_temperature: 0.05
+  stage2_cvar_fraction: 0.25
+  stage2_gate_budget: 0.1
+  stage2_gate_minimum_keep: 0.5
+  stage2_gate_temperature: 1.0
+  stage2_gate_seed_offset: 200003
+  stage2_centered_logit_weight: 0.05
+  stage2_pairwise_ranking_weight: 0.05
+  stage2_pairwise_margin: 0.05
+  stage2_log_interval: 10
+  stage2_require_baseline_teacher: false
+Stage2DCNv2_multi_layer_no_gate_full:
+  model: FairJobGraphContainmentDCNv2
+  dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 4096
+  embedding_dim: 16
+  epochs: 20
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+  stage2_method: multi_layer_no_gate
+  stage2_representation_graph: configs/fairjob/stage2_representation_graph.yaml
+  stage2_adversary_nodes:
+  - cross_layer_0
+  - cross_layer_1
+  - cross_layer_2
+  - parallel_dnn_path_output
+  - fusion_pre_logit
+  stage2_joint_paths:
+    cross_dnn_outputs:
+    - cross_layer_2
+    - parallel_dnn_path_output
+  stage2_adversary_hidden_units:
+  - 64
+  stage2_adversarial_weight: 0.1
+  stage2_gradient_reversal_scale: 1.0
+  stage2_graph_risk_mode: smooth_max_proxy_advantage
+  stage2_graph_risk_temperature: 0.05
+  stage2_cvar_fraction: 0.25
+  stage2_gate_budget: 0.1
+  stage2_gate_minimum_keep: 0.5
+  stage2_gate_temperature: 1.0
+  stage2_gate_seed_offset: 200003
+  stage2_centered_logit_weight: 0.05
+  stage2_pairwise_ranking_weight: 0.05
+  stage2_pairwise_margin: 0.05
+  stage2_log_interval: 50
+  stage2_require_baseline_teacher: true
+Stage2DCNv2_final_only_path_gate_smoke:
+  model: FairJobGraphContainmentDCNv2
+  dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_smoke
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 1024
+  embedding_dim: 16
+  epochs: 1
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+  stage2_method: final_only_path_gate
+  stage2_representation_graph: configs/fairjob/stage2_representation_graph.yaml
+  stage2_adversary_nodes:
+  - cross_layer_0
+  - cross_layer_1
+  - cross_layer_2
+  - parallel_dnn_path_output
+  - fusion_pre_logit
+  stage2_joint_paths:
+    cross_dnn_outputs:
+    - cross_layer_2
+    - parallel_dnn_path_output
+  stage2_adversary_hidden_units:
+  - 64
+  stage2_adversarial_weight: 0.1
+  stage2_gradient_reversal_scale: 1.0
+  stage2_graph_risk_mode: smooth_max_proxy_advantage
+  stage2_graph_risk_temperature: 0.05
+  stage2_cvar_fraction: 0.25
+  stage2_gate_budget: 0.1
+  stage2_gate_minimum_keep: 0.5
+  stage2_gate_temperature: 1.0
+  stage2_gate_seed_offset: 200003
+  stage2_centered_logit_weight: 0.05
+  stage2_pairwise_ranking_weight: 0.05
+  stage2_pairwise_margin: 0.05
+  stage2_log_interval: 10
+  stage2_require_baseline_teacher: false
+Stage2DCNv2_final_only_path_gate_full:
+  model: FairJobGraphContainmentDCNv2
+  dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 4096
+  embedding_dim: 16
+  epochs: 20
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+  stage2_method: final_only_path_gate
+  stage2_representation_graph: configs/fairjob/stage2_representation_graph.yaml
+  stage2_adversary_nodes:
+  - cross_layer_0
+  - cross_layer_1
+  - cross_layer_2
+  - parallel_dnn_path_output
+  - fusion_pre_logit
+  stage2_joint_paths:
+    cross_dnn_outputs:
+    - cross_layer_2
+    - parallel_dnn_path_output
+  stage2_adversary_hidden_units:
+  - 64
+  stage2_adversarial_weight: 0.1
+  stage2_gradient_reversal_scale: 1.0
+  stage2_graph_risk_mode: smooth_max_proxy_advantage
+  stage2_graph_risk_temperature: 0.05
+  stage2_cvar_fraction: 0.25
+  stage2_gate_budget: 0.1
+  stage2_gate_minimum_keep: 0.5
+  stage2_gate_temperature: 1.0
+  stage2_gate_seed_offset: 200003
+  stage2_centered_logit_weight: 0.05
+  stage2_pairwise_ranking_weight: 0.05
+  stage2_pairwise_margin: 0.05
+  stage2_log_interval: 50
+  stage2_require_baseline_teacher: true
+Stage2DCNv2_multi_layer_path_gate_full_smoke:
+  model: FairJobGraphContainmentDCNv2
+  dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_smoke
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 1024
+  embedding_dim: 16
+  epochs: 1
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+  stage2_method: multi_layer_path_gate_full
+  stage2_representation_graph: configs/fairjob/stage2_representation_graph.yaml
+  stage2_adversary_nodes:
+  - cross_layer_0
+  - cross_layer_1
+  - cross_layer_2
+  - parallel_dnn_path_output
+  - fusion_pre_logit
+  stage2_joint_paths:
+    cross_dnn_outputs:
+    - cross_layer_2
+    - parallel_dnn_path_output
+  stage2_adversary_hidden_units:
+  - 64
+  stage2_adversarial_weight: 0.1
+  stage2_gradient_reversal_scale: 1.0
+  stage2_graph_risk_mode: smooth_max_proxy_advantage
+  stage2_graph_risk_temperature: 0.05
+  stage2_cvar_fraction: 0.25
+  stage2_gate_budget: 0.1
+  stage2_gate_minimum_keep: 0.5
+  stage2_gate_temperature: 1.0
+  stage2_gate_seed_offset: 200003
+  stage2_centered_logit_weight: 0.05
+  stage2_pairwise_ranking_weight: 0.05
+  stage2_pairwise_margin: 0.05
+  stage2_log_interval: 10
+  stage2_require_baseline_teacher: false
+Stage2DCNv2_multi_layer_path_gate_full_full:
+  model: FairJobGraphContainmentDCNv2
+  dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 4096
+  embedding_dim: 16
+  epochs: 20
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+  stage2_method: multi_layer_path_gate_full
+  stage2_representation_graph: configs/fairjob/stage2_representation_graph.yaml
+  stage2_adversary_nodes:
+  - cross_layer_0
+  - cross_layer_1
+  - cross_layer_2
+  - parallel_dnn_path_output
+  - fusion_pre_logit
+  stage2_joint_paths:
+    cross_dnn_outputs:
+    - cross_layer_2
+    - parallel_dnn_path_output
+  stage2_adversary_hidden_units:
+  - 64
+  stage2_adversarial_weight: 0.1
+  stage2_gradient_reversal_scale: 1.0
+  stage2_graph_risk_mode: smooth_max_proxy_advantage
+  stage2_graph_risk_temperature: 0.05
+  stage2_cvar_fraction: 0.25
+  stage2_gate_budget: 0.1
+  stage2_gate_minimum_keep: 0.5
+  stage2_gate_temperature: 1.0
+  stage2_gate_seed_offset: 200003
+  stage2_centered_logit_weight: 0.05
+  stage2_pairwise_ranking_weight: 0.05
+  stage2_pairwise_margin: 0.05
+  stage2_log_interval: 50
+  stage2_require_baseline_teacher: true
+Stage2DCNv2_full_without_joint_adversary_smoke:
+  model: FairJobGraphContainmentDCNv2
+  dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_smoke
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 1024
+  embedding_dim: 16
+  epochs: 1
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+  stage2_method: full_without_joint_adversary
+  stage2_representation_graph: configs/fairjob/stage2_representation_graph.yaml
+  stage2_adversary_nodes:
+  - cross_layer_0
+  - cross_layer_1
+  - cross_layer_2
+  - parallel_dnn_path_output
+  - fusion_pre_logit
+  stage2_joint_paths:
+    cross_dnn_outputs:
+    - cross_layer_2
+    - parallel_dnn_path_output
+  stage2_adversary_hidden_units:
+  - 64
+  stage2_adversarial_weight: 0.1
+  stage2_gradient_reversal_scale: 1.0
+  stage2_graph_risk_mode: smooth_max_proxy_advantage
+  stage2_graph_risk_temperature: 0.05
+  stage2_cvar_fraction: 0.25
+  stage2_gate_budget: 0.1
+  stage2_gate_minimum_keep: 0.5
+  stage2_gate_temperature: 1.0
+  stage2_gate_seed_offset: 200003
+  stage2_centered_logit_weight: 0.05
+  stage2_pairwise_ranking_weight: 0.05
+  stage2_pairwise_margin: 0.05
+  stage2_log_interval: 10
+  stage2_require_baseline_teacher: false
+Stage2DCNv2_full_without_joint_adversary_full:
+  model: FairJobGraphContainmentDCNv2
+  dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 4096
+  embedding_dim: 16
+  epochs: 20
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+  stage2_method: full_without_joint_adversary
+  stage2_representation_graph: configs/fairjob/stage2_representation_graph.yaml
+  stage2_adversary_nodes:
+  - cross_layer_0
+  - cross_layer_1
+  - cross_layer_2
+  - parallel_dnn_path_output
+  - fusion_pre_logit
+  stage2_joint_paths:
+    cross_dnn_outputs:
+    - cross_layer_2
+    - parallel_dnn_path_output
+  stage2_adversary_hidden_units:
+  - 64
+  stage2_adversarial_weight: 0.1
+  stage2_gradient_reversal_scale: 1.0
+  stage2_graph_risk_mode: smooth_max_proxy_advantage
+  stage2_graph_risk_temperature: 0.05
+  stage2_cvar_fraction: 0.25
+  stage2_gate_budget: 0.1
+  stage2_gate_minimum_keep: 0.5
+  stage2_gate_temperature: 1.0
+  stage2_gate_seed_offset: 200003
+  stage2_centered_logit_weight: 0.05
+  stage2_pairwise_ranking_weight: 0.05
+  stage2_pairwise_margin: 0.05
+  stage2_log_interval: 50
+  stage2_require_baseline_teacher: true
+Stage2DCNv2_layer_risk_sum_smoke:
+  model: FairJobGraphContainmentDCNv2
+  dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_smoke
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 1024
+  embedding_dim: 16
+  epochs: 1
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+  stage2_method: layer_risk_sum
+  stage2_representation_graph: configs/fairjob/stage2_representation_graph.yaml
+  stage2_adversary_nodes:
+  - cross_layer_0
+  - cross_layer_1
+  - cross_layer_2
+  - parallel_dnn_path_output
+  - fusion_pre_logit
+  stage2_joint_paths:
+    cross_dnn_outputs:
+    - cross_layer_2
+    - parallel_dnn_path_output
+  stage2_adversary_hidden_units:
+  - 64
+  stage2_adversarial_weight: 0.1
+  stage2_gradient_reversal_scale: 1.0
+  stage2_graph_risk_mode: smooth_max_proxy_advantage
+  stage2_graph_risk_temperature: 0.05
+  stage2_cvar_fraction: 0.25
+  stage2_gate_budget: 0.1
+  stage2_gate_minimum_keep: 0.5
+  stage2_gate_temperature: 1.0
+  stage2_gate_seed_offset: 200003
+  stage2_centered_logit_weight: 0.05
+  stage2_pairwise_ranking_weight: 0.05
+  stage2_pairwise_margin: 0.05
+  stage2_log_interval: 10
+  stage2_require_baseline_teacher: false
+Stage2DCNv2_layer_risk_sum_full:
+  model: FairJobGraphContainmentDCNv2
+  dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 4096
+  embedding_dim: 16
+  epochs: 20
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+  stage2_method: layer_risk_sum
+  stage2_representation_graph: configs/fairjob/stage2_representation_graph.yaml
+  stage2_adversary_nodes:
+  - cross_layer_0
+  - cross_layer_1
+  - cross_layer_2
+  - parallel_dnn_path_output
+  - fusion_pre_logit
+  stage2_joint_paths:
+    cross_dnn_outputs:
+    - cross_layer_2
+    - parallel_dnn_path_output
+  stage2_adversary_hidden_units:
+  - 64
+  stage2_adversarial_weight: 0.1
+  stage2_gradient_reversal_scale: 1.0
+  stage2_graph_risk_mode: smooth_max_proxy_advantage
+  stage2_graph_risk_temperature: 0.05
+  stage2_cvar_fraction: 0.25
+  stage2_gate_budget: 0.1
+  stage2_gate_minimum_keep: 0.5
+  stage2_gate_temperature: 1.0
+  stage2_gate_seed_offset: 200003
+  stage2_centered_logit_weight: 0.05
+  stage2_pairwise_ranking_weight: 0.05
+  stage2_pairwise_margin: 0.05
+  stage2_log_interval: 50
+  stage2_require_baseline_teacher: true
+Stage2DCNv2_structured_random_gate_smoke:
+  model: FairJobGraphContainmentDCNv2
+  dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_smoke
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 1024
+  embedding_dim: 16
+  epochs: 1
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+  stage2_method: structured_random_gate
+  stage2_representation_graph: configs/fairjob/stage2_representation_graph.yaml
+  stage2_adversary_nodes:
+  - cross_layer_0
+  - cross_layer_1
+  - cross_layer_2
+  - parallel_dnn_path_output
+  - fusion_pre_logit
+  stage2_joint_paths:
+    cross_dnn_outputs:
+    - cross_layer_2
+    - parallel_dnn_path_output
+  stage2_adversary_hidden_units:
+  - 64
+  stage2_adversarial_weight: 0.1
+  stage2_gradient_reversal_scale: 1.0
+  stage2_graph_risk_mode: smooth_max_proxy_advantage
+  stage2_graph_risk_temperature: 0.05
+  stage2_cvar_fraction: 0.25
+  stage2_gate_budget: 0.1
+  stage2_gate_minimum_keep: 0.5
+  stage2_gate_temperature: 1.0
+  stage2_gate_seed_offset: 200003
+  stage2_centered_logit_weight: 0.05
+  stage2_pairwise_ranking_weight: 0.05
+  stage2_pairwise_margin: 0.05
+  stage2_log_interval: 10
+  stage2_require_baseline_teacher: false
+Stage2DCNv2_structured_random_gate_full:
+  model: FairJobGraphContainmentDCNv2
+  dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 4096
+  embedding_dim: 16
+  epochs: 20
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+  stage2_method: structured_random_gate
+  stage2_representation_graph: configs/fairjob/stage2_representation_graph.yaml
+  stage2_adversary_nodes:
+  - cross_layer_0
+  - cross_layer_1
+  - cross_layer_2
+  - parallel_dnn_path_output
+  - fusion_pre_logit
+  stage2_joint_paths:
+    cross_dnn_outputs:
+    - cross_layer_2
+    - parallel_dnn_path_output
+  stage2_adversary_hidden_units:
+  - 64
+  stage2_adversarial_weight: 0.1
+  stage2_gradient_reversal_scale: 1.0
+  stage2_graph_risk_mode: smooth_max_proxy_advantage
+  stage2_graph_risk_temperature: 0.05
+  stage2_cvar_fraction: 0.25
+  stage2_gate_budget: 0.1
+  stage2_gate_minimum_keep: 0.5
+  stage2_gate_temperature: 1.0
+  stage2_gate_seed_offset: 200003
+  stage2_centered_logit_weight: 0.05
+  stage2_pairwise_ranking_weight: 0.05
+  stage2_pairwise_margin: 0.05
+  stage2_log_interval: 50
+  stage2_require_baseline_teacher: true
+Stage2DCNv2_matched_capacity_regularization_smoke:
+  model: FairJobGraphContainmentDCNv2
+  dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_smoke
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 1024
+  embedding_dim: 16
+  epochs: 1
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+  stage2_method: matched_capacity_regularization
+  stage2_representation_graph: configs/fairjob/stage2_representation_graph.yaml
+  stage2_adversary_nodes:
+  - cross_layer_0
+  - cross_layer_1
+  - cross_layer_2
+  - parallel_dnn_path_output
+  - fusion_pre_logit
+  stage2_joint_paths:
+    cross_dnn_outputs:
+    - cross_layer_2
+    - parallel_dnn_path_output
+  stage2_adversary_hidden_units:
+  - 64
+  stage2_adversarial_weight: 0.1
+  stage2_gradient_reversal_scale: 1.0
+  stage2_graph_risk_mode: smooth_max_proxy_advantage
+  stage2_graph_risk_temperature: 0.05
+  stage2_cvar_fraction: 0.25
+  stage2_gate_budget: 0.1
+  stage2_gate_minimum_keep: 0.5
+  stage2_gate_temperature: 1.0
+  stage2_gate_seed_offset: 200003
+  stage2_centered_logit_weight: 0.05
+  stage2_pairwise_ranking_weight: 0.05
+  stage2_pairwise_margin: 0.05
+  stage2_log_interval: 10
+  stage2_require_baseline_teacher: false
+Stage2DCNv2_matched_capacity_regularization_full:
+  model: FairJobGraphContainmentDCNv2
+  dataset_id: fairjob_m5_pre_ranking_no_user_id_proxy_excluded_full
+  loss: binary_crossentropy
+  metrics:
+  - logloss
+  - AUC
+  task: binary_classification
+  optimizer: adam
+  learning_rate: 0.001
+  embedding_regularizer: 1.0e-08
+  net_regularizer: 0
+  batch_size: 4096
+  embedding_dim: 16
+  epochs: 20
+  shuffle: true
+  seed: 2019
+  monitor: AUC
+  monitor_mode: max
+  model_structure: parallel
+  use_low_rank_mixture: false
+  low_rank: 32
+  num_experts: 4
+  stacked_dnn_hidden_units:
+  - 256
+  - 128
+  parallel_dnn_hidden_units:
+  - 256
+  - 128
+  dnn_activations: relu
+  num_cross_layers: 3
+  net_dropout: 0.1
+  batch_norm: false
+  stage2_method: matched_capacity_regularization
+  stage2_representation_graph: configs/fairjob/stage2_representation_graph.yaml
+  stage2_adversary_nodes:
+  - cross_layer_0
+  - cross_layer_1
+  - cross_layer_2
+  - parallel_dnn_path_output
+  - fusion_pre_logit
+  stage2_joint_paths:
+    cross_dnn_outputs:
+    - cross_layer_2
+    - parallel_dnn_path_output
+  stage2_adversary_hidden_units:
+  - 64
+  stage2_adversarial_weight: 0.1
+  stage2_gradient_reversal_scale: 1.0
+  stage2_graph_risk_mode: smooth_max_proxy_advantage
+  stage2_graph_risk_temperature: 0.05
+  stage2_cvar_fraction: 0.25
+  stage2_gate_budget: 0.1
+  stage2_gate_minimum_keep: 0.5
+  stage2_gate_temperature: 1.0
+  stage2_gate_seed_offset: 200003
+  stage2_centered_logit_weight: 0.05
+  stage2_pairwise_ranking_weight: 0.05
+  stage2_pairwise_margin: 0.05
+  stage2_log_interval: 50
+  stage2_require_baseline_teacher: true

@@ -1,0 +1,70 @@
+version: 1
+backbone: DCNv2
+feature_protocol: pre_ranking_no_user_id_proxy_excluded
+seeds: [2019, 2020, 2021]
+
+methods:
+  baseline:
+    adversary_scope: none
+    gate_mode: identity
+    role: paired_reference
+  final_only_no_gate:
+    adversary_scope: fusion_pre_logit
+    gate_mode: identity
+    role: final_layer_adversary_control
+  multi_layer_no_gate:
+    adversary_scope: registered_nodes
+    gate_mode: identity
+    role: multi_node_adversary_control
+  final_only_path_gate:
+    adversary_scope: fusion_pre_logit
+    gate_mode: learned_structural
+    role: gate_scope_ablation
+  multi_layer_path_gate_full:
+    adversary_scope: registered_nodes_and_joint_paths
+    gate_mode: learned_structural
+    role: primary_method
+  full_without_joint_adversary:
+    adversary_scope: registered_nodes
+    gate_mode: learned_structural
+    role: joint_path_ablation
+  layer_risk_sum:
+    adversary_scope: registered_nodes_and_joint_paths
+    gate_mode: learned_structural
+    graph_risk: mean_bce
+    role: worst_path_risk_ablation
+  structured_random_gate:
+    adversary_scope: registered_nodes_and_joint_paths
+    gate_mode: frozen_random_same_budget
+    role: structured_gate_control
+  matched_capacity_regularization:
+    adversary_scope: registered_nodes_and_joint_paths
+    gradient_reversal_scale: 0.0
+    gate_mode: identity
+    role: added_capacity_and_optimization_control
+
+execution:
+  p1_bounded_smoke:
+    seeds: [2019]
+    methods:
+      - baseline
+      - multi_layer_path_gate_full
+      - structured_random_gate
+      - matched_capacity_regularization
+    formal_evidence: false
+  p2_pilot:
+    seeds: [2019, 2020, 2021]
+    methods: all
+    formal_evidence: true
+    requires_same_seed_baseline_teacher: true
+  five_seed_expansion:
+    allowed_only_after: full_pass
+
+frozen_controls:
+  same_backbone_initialization: true
+  same_seed_baseline_teacher: true
+  same_feature_protocol: true
+  same_outer_split: sequential_80_20
+  same_training_row_membership_across_methods: true
+  validation_only_model_selection: true
+  test_driven_weight_selection: false

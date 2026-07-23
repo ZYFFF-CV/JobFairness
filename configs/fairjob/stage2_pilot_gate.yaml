@@ -1,0 +1,72 @@
+version: 1
+stage: S2-P0.6
+seeds: [2019, 2020, 2021]
+selection_scope: validation_only
+test_used_for_selection: false
+
+containment:
+  material_delta: 0.005
+  target_mean_delta_max: -0.005
+  target_seed_direction: all_negative
+  joint_target_mean_delta_max: -0.005
+  non_target_mean_delta_max_exclusive: 0.005
+  non_target_material_seed_count_max: 1
+  full_pass_migration_count: 0
+  partial_pass_migration_count: 1
+
+utility:
+  auc:
+    mean_delta_min: -0.005
+    per_seed_delta_min: -0.010
+  calibrated_nllh:
+    mean_delta_max: 0.001
+    per_seed_delta_max: 0.002
+  calibrated_brier:
+    mean_delta_max: 0.0001
+    per_seed_delta_max: 0.0002
+    status: provisional_screening_margin_frozen_before_training
+  class_gap_ratio:
+    mean_min: 0.80
+    per_seed_catastrophic_min: 0.70
+    status: screening_safety_margin
+  pairwise_ranking_loss_ratio:
+    mean_max: 1.02
+    per_seed_max: 1.05
+    status: validation_normalized_screening_margin
+
+collapse:
+  any_seed_collapse: fail
+  score_variance_role: two_sided_warning_only
+  required_signals:
+    - auc
+    - class_gap
+    - calibrated_nllh
+    - calibrated_brier
+    - pairwise_ranking
+    - score_dynamic_range
+
+control_superiority:
+  required_controls:
+    - final_only_no_gate
+    - multi_layer_no_gate
+    - final_only_path_gate
+    - structured_random_gate
+    - matched_capacity_regularization
+
+secondary_reports:
+  - DP_signed
+  - DP_abs
+  - group_ECE_gap
+  - U
+  - U_TILDE
+  - score_variance
+  - score_dynamic_range
+
+partial_pass:
+  maximum_repairs: 1
+  permits_five_seed_expansion: false
+
+claim_boundary:
+  - screening_gate_not_publication_significance
+  - no_threshold_relaxation_after_test_read
+  - DP_not_primary_pilot_endpoint

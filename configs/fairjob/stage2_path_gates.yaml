@@ -1,0 +1,33 @@
+version: 1
+gate_scope: architecture_named_block_and_branch
+gate_names:
+  - cross_increment_0
+  - cross_increment_1
+  - cross_increment_2
+  - parallel_dnn_linear_0
+  - parallel_dnn_linear_1
+  - cross_path_output
+  - parallel_dnn_path_output
+
+parameterization:
+  mode: fixed_total_suppression_budget
+  suppression_budget_per_gate: 0.10
+  minimum_keep: 0.50
+  initialization: uniform_budget
+  learned_temperature: 1.0
+
+structured_random_control:
+  seed_offset: 200003
+  distribution: frozen_softmax_allocation
+  same_total_budget: true
+  same_minimum_keep: true
+
+inference:
+  adversary_removed: true
+  proxy_input_required: false
+  gate_values_frozen_with_checkpoint: true
+
+claim_boundary:
+  - gates_are_structural_controls_not_causal_paths
+  - no_hidden_coordinate_interpretation
+  - cross_seed_comparison_only_at_named_structure_level

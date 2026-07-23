@@ -1,0 +1,101 @@
+version: 1
+backbone: FairJobDCNv2
+model_structure: parallel
+research_scope: behavioral_protected_proxy_decodability
+
+nodes:
+  embedding_flat:
+    kind: sentinel
+    parents: [model_inputs]
+  cross_increment_0:
+    kind: target
+    parents: [embedding_flat]
+  cross_layer_0:
+    kind: target
+    parents: [embedding_flat, cross_increment_0]
+  cross_increment_1:
+    kind: target
+    parents: [embedding_flat, cross_layer_0]
+  cross_layer_1:
+    kind: target
+    parents: [cross_layer_0, cross_increment_1]
+  cross_increment_2:
+    kind: target
+    parents: [embedding_flat, cross_layer_1]
+  cross_layer_2:
+    kind: target
+    parents: [cross_layer_1, cross_increment_2]
+  cross_path_output:
+    kind: target
+    parents: [cross_layer_2]
+  parallel_dnn_linear_0:
+    kind: target
+    parents: [embedding_flat]
+  parallel_dnn_linear_1:
+    kind: target
+    parents: [parallel_dnn_linear_0]
+  parallel_dnn_path_output:
+    kind: target
+    parents: [parallel_dnn_linear_1]
+  fusion_pre_logit:
+    kind: target
+    parents: [cross_path_output, parallel_dnn_path_output]
+  dcnv2_final:
+    kind: target
+    parents: [fusion_pre_logit]
+    alias_of: fusion_pre_logit
+  dcnv2_logit:
+    kind: sentinel
+    parents: [dcnv2_final]
+  dcnv2_probability:
+    kind: sentinel
+    parents: [dcnv2_logit]
+
+legacy_nodes:
+  dcnv2_final_pre_mitigation:
+    kind: legacy_control
+    source: FairJobMitigatedDCNv2
+  dcnv2_suppressed_component:
+    kind: legacy_control
+    source: FairJobMitigatedDCNv2
+  dcnv2_residual_component:
+    kind: legacy_control
+    source: FairJobMitigatedDCNv2
+
+joint_paths:
+  cross_dnn_outputs:
+    members: [cross_path_output, parallel_dnn_path_output]
+    kind: target
+  cross_block_increments:
+    members: [cross_increment_0, cross_increment_1, cross_increment_2]
+    kind: target
+  branch_outputs_with_fusion:
+    members: [cross_path_output, parallel_dnn_path_output, fusion_pre_logit]
+    kind: target
+  legacy_suppression_components:
+    members: [dcnv2_suppressed_component, dcnv2_residual_component]
+    kind: legacy_control
+
+target_nodes:
+  - cross_increment_0
+  - cross_layer_0
+  - cross_increment_1
+  - cross_layer_1
+  - cross_increment_2
+  - cross_layer_2
+  - cross_path_output
+  - parallel_dnn_linear_0
+  - parallel_dnn_linear_1
+  - parallel_dnn_path_output
+  - fusion_pre_logit
+  - dcnv2_final
+
+sentinel_nodes:
+  - embedding_flat
+  - dcnv2_logit
+  - dcnv2_probability
+
+claim_boundary:
+  - behavioral_proxy_not_verified_demographic_attribute
+  - probe_family_guardedness_not_information_erasure
+  - descriptive_association_not_causal_fairness
