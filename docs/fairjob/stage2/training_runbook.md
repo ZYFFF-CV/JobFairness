@@ -96,3 +96,42 @@ visible in the server console and no daemon or background process is created.
 The formal pilot is evaluated only by
 `configs/fairjob/stage2_pilot_gate.yaml`. Test metrics must not be used to
 change objective weights, thresholds, gate budgets, or probe capacities.
+
+## P3 Checkpoint Probe Audit
+
+The 27 P2 jobs completed on the frozen three-seed matrix. P3 reconstructs each
+checkpoint on the frozen row-disjoint sample, derives the raw-user-disjoint
+view, and runs the preregistered linear, matched-capacity nonlinear, and
+independent bounded probes. Representations exist only in memory for one
+checkpoint at a time. Only compact JSON results are persisted under
+`/root/autodl-tmp/workdirs/JobFairness/stage2/probes`.
+
+Inspect the complete command matrix without running probes:
+
+```bash
+cd /root/autodl-tmp/code/JobFairness
+/root/autodl-tmp/workdirs/JobFairness/venv/bin/python -u \
+  fuxictr_ext/fairjob/run_stage2_probe_matrix.py --dry_run
+```
+
+Run a bounded baseline/primary checkpoint pair first:
+
+```bash
+/root/autodl-tmp/workdirs/JobFairness/venv/bin/python -u \
+  fuxictr_ext/fairjob/run_stage2_probe_matrix.py \
+  --seeds 2019 \
+  --methods baseline multi_layer_path_gate_full
+```
+
+After the bounded pair confirms runtime and memory use, run or resume all 27
+audits:
+
+```bash
+/root/autodl-tmp/workdirs/JobFairness/venv/bin/python -u \
+  fuxictr_ext/fairjob/run_stage2_probe_matrix.py
+```
+
+The process remains in the foreground and prints split reconstruction plus
+target/protocol progress. Reruns skip only complete results produced by the
+current audit commit. A partial per-checkpoint result resumes completed probe
+targets after reconstructing its frozen in-memory sample.
