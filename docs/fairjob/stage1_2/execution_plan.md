@@ -66,19 +66,28 @@ Stage1.2 用于定位 Stage1.1 公平干预失败发生在证据链的哪个环�
 
 ### Tier 1：不训练诊断
 
-状态：进行中。M2 已允许无训练的 collapse 与 calibration 归因，但未批准 Tier 2 新训练。
+状态：已完成。18 组现有预测均完成 score/logit distribution、collapse
+和 validation-only calibration 诊断。Adversarial 三个种子全部触发
+fairness-by-collapse 判据；suppression 的 NLLH 改善可由 group-blind
+calibration 复现。详见
+`docs/fairjob/stage1_2/regularization_and_collapse_report.md`。
 
 使用现有预测和导出表征检查 prediction/logit 均值、标准差、分位数、熵、动态范围、正负样本分数间隔、AUC、NLLH、Brier、ECE 和 DP 的联合变化。优先判断 adversarial 的低 DP 是否来自预测坍缩，并用 validation-only temperature scaling、beta calibration 或 isotonic calibration 判断 NLLH/ECE 改善是否可由后处理复现。
 
 ### Tier 2：条件性轻量训练
 
-默认不执行。只有 M2 证明 leakage 稳定下降且 Tier 1 无法解释结果时，才允许在预先固定的小矩阵中比较 L2、dropout 或容量匹配对照；不得使用 test 指标选参数。
+状态：未执行且未批准。M2 未发现无迁移的稳定 leakage reduction，Tier 1
+又已用预测坍缩和普通校准解释主要表象，因此不满足新增训练门槛。
 
 退出门槛：对 global、random、selective 和 adversarial 分别给出泄漏、迁移、坍缩、通用正则化/校准解释及剩余机制效应。
 
 ## S12-M4：Outcome 地板与稳定性
 
-状态：等待 M2/M3。
+状态：已完成。六种方法乘三个种子的现有 outcome 诊断已聚合；补充了
+三协议 DP、group quality、calibration curve、score distance、ranking、
+bootstrap 和 proxy sensitivity。DP 判定为
+`DP_near_floor_for_current_setting`，不能继续作为唯一或主要优化目标。
+详见 `docs/fairjob/stage1_2/outcome_floor_and_stability_report.md`。
 
 1. 对 `all_logged`、`random_display`、`context_conditioned` 报告 DP signed/abs、两组预测均值与组样本数。
 2. 报告 group-wise AUC/NLLH/Brier/ECE、worst-group 指标、组间 gap、分数分布距离、U 和 U_TILDE。
@@ -89,7 +98,10 @@ Stage1.2 用于定位 Stage1.1 公平干预失败发生在证据链的哪个环�
 
 ## S12-M5：唯一 Stage2 方向
 
-状态：等待 M2-M4。
+状态：已完成。按冻结触发规则唯一选择方向 A：重新设计多层/多路径
+leakage intervention。B/C/D/E 因缺少各自必要证据未被选择；任何新的
+长训练须先通过 Stage2-A validation-only pilot gate。详见
+`docs/fairjob/stage1_2/stage1_2_decision_report.md`。
 
 严格按照 Stage1.2 文档中的触发条件，从以下方向中只选择一个：
 
