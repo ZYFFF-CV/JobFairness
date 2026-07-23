@@ -37,9 +37,12 @@ task_preservation:
   centered_logit_distillation:
     enabled: true
     weight: 0.05
+    normalization: frozen_teacher_batch_standard_deviation
+    loss: smooth_l1
   pairwise_ranking:
     enabled: true
     weight: 0.05
+    normalization: frozen_teacher_batch_standard_deviation
   exact_probability_distillation: false
 
 telemetry:

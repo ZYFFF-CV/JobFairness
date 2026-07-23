@@ -708,24 +708,39 @@ class FairJobGraphContainmentDCNv2(FairJobDCNv2):
         return result
 
     def _preservation_losses(self, return_dict: dict) -> tuple:
-        """Penalize score collapse without copying exact probabilities."""
+        """Penalize score collapse on a teacher-normalized logit scale."""
 
         logit = return_dict["stage2_representations"]["dcnv2_logit"]
         teacher = return_dict.get("frozen_teacher_logit")
         connected_zero = logit.sum() * 0.0
         if teacher is None:
-            return connected_zero, connected_zero
+            return connected_zero, connected_zero, None
         centered = logit - logit.mean()
         teacher_centered = teacher - teacher.mean()
-        centered_loss = F.mse_loss(centered, teacher_centered)
+        # CrossNet logits can span hundreds or thousands even when sigmoid
+        # probabilities remain finite. Scaling by the frozen teacher's batch
+        # standard deviation keeps the preservation weight comparable across
+        # batches and seeds; SmoothL1 prevents a few extreme rows from taking
+        # over the graph-containment objective.
+        teacher_scale = teacher_centered.detach().std(unbiased=False).clamp_min(
+            0.1
+        )
+        centered_loss = F.smooth_l1_loss(
+            centered / teacher_scale,
+            teacher_centered / teacher_scale,
+        )
 
         if len(logit) < 2:
-            return centered_loss, connected_zero
+            return centered_loss, connected_zero, teacher_scale
         pair_rows = (len(logit) // 2) * 2
         student_pairs = logit[:pair_rows].reshape(-1, 2)
         teacher_pairs = teacher[:pair_rows].reshape(-1, 2)
-        student_difference = student_pairs[:, 1] - student_pairs[:, 0]
-        teacher_difference = teacher_pairs[:, 1] - teacher_pairs[:, 0]
+        student_difference = (
+            student_pairs[:, 1] - student_pairs[:, 0]
+        ) / teacher_scale
+        teacher_difference = (
+            teacher_pairs[:, 1] - teacher_pairs[:, 0]
+        ) / teacher_scale
         direction = torch.sign(teacher_difference)
         informative = direction != 0
         if informative.any():
@@ -735,7 +750,7 @@ class FairJobGraphContainmentDCNv2(FairJobDCNv2):
             ).mean()
         else:
             ranking_loss = connected_zero
-        return centered_loss, ranking_loss
+        return centered_loss, ranking_loss, teacher_scale
 
     def compute_loss(self, return_dict, y_true):
         """Combine native CTR, graph containment, and anti-collapse objectives."""
@@ -756,7 +771,9 @@ class FairJobGraphContainmentDCNv2(FairJobDCNv2):
                 }
             )
 
-        centered_loss, ranking_loss = self._preservation_losses(return_dict)
+        centered_loss, ranking_loss, teacher_scale = self._preservation_losses(
+            return_dict
+        )
         total_loss = (
             total_loss
             + self.stage2_centered_logit_weight * centered_loss
@@ -777,6 +794,11 @@ class FairJobGraphContainmentDCNv2(FairJobDCNv2):
             {
                 "centered_logit_loss": float(centered_loss.detach().cpu()),
                 "pairwise_ranking_loss": float(ranking_loss.detach().cpu()),
+                "teacher_logit_scale": (
+                    float(teacher_scale.detach().cpu())
+                    if teacher_scale is not None
+                    else None
+                ),
                 "score_mean": float(probability.mean().cpu()),
                 "score_std": float(probability.std(unbiased=False).cpu()),
                 "logit_dynamic_range": float(

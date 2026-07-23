@@ -155,3 +155,22 @@ def test_frozen_baseline_teacher_initializes_student_and_stays_in_eval(tmp_path)
     assert "frozen_teacher_logit" in output
     loss = model.compute_loss(output, model.get_labels(_batch()))
     assert loss.isfinite()
+    assert model._stage2_last_telemetry["teacher_logit_scale"] >= 0.1
+
+
+def test_preservation_loss_is_stable_under_large_common_logit_scale(tmp_path):
+    model = FairJobGraphContainmentDCNv2(
+        _feature_map(tmp_path),
+        stage2_method="baseline",
+        **_params(tmp_path),
+    )
+    student = torch.tensor([[0.0], [1000.0], [-1000.0], [500.0]])
+    teacher = student + torch.tensor([[0.0], [20.0], [-20.0], [10.0]])
+    return_dict = {
+        "stage2_representations": {"dcnv2_logit": student},
+        "frozen_teacher_logit": teacher,
+    }
+    centered, ranking, scale = model._preservation_losses(return_dict)
+    assert centered < 0.01
+    assert ranking.isfinite()
+    assert scale > 100.0
