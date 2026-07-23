@@ -113,8 +113,13 @@ class StructuredPathGates(nn.Module):
             "suppression": {
                 name: 1.0 - value for name, value in values.items()
             },
-            "nominal_total_suppression": (
+            "configured_total_suppression": (
                 self.suppression_budget_per_gate * len(self.names)
+            ),
+            "nominal_total_suppression": (
+                0.0
+                if self.mode == "identity"
+                else self.suppression_budget_per_gate * len(self.names)
             ),
             "actual_total_suppression": sum(1.0 - value for value in values.values()),
             "minimum_keep": self.minimum_keep,

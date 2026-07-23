@@ -37,6 +37,9 @@ def test_identity_gate_preserves_values_exactly():
     gates = StructuredPathGates(NAMES, mode="identity")
     value = torch.randn(4, 7)
     assert torch.equal(gates.apply("fusion", value), value)
+    telemetry = gates.telemetry()
+    assert telemetry["configured_total_suppression"] == pytest.approx(0.4)
+    assert telemetry["nominal_total_suppression"] == 0.0
 
 
 def test_frozen_random_gate_is_seed_deterministic_and_budget_matched():

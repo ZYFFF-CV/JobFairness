@@ -1,6 +1,6 @@
 # Stage2 DCNv2 Representation Graph Audit
 
-Status: implementation-frozen; server dry-run evidence pending.
+Status: passed on the seed-2019 server GPU dry-run.
 
 ## Scope
 
@@ -63,8 +63,33 @@ are not treated as native DCNv2 paths.
 - prediction equality between `forward()` and representation export;
 - graph and gate definition hashes in the run manifest.
 
-The final section of this document will be updated with the server manifest
-after the seed-2019 bounded dry-run.
+## Server Evidence
+
+The audit ran on commit
+`f80d8c8fb790ddecb8335b01aee0dd69b5a56b6f` with one RTX 4090 batch of
+1,024 rows. The manifest is stored outside Git at:
+
+```text
+/root/autodl-tmp/workdirs/JobFairness/stage2/smoke/seed2019/baseline_dry_run/run_manifest.json
+```
+
+Observed dimensions:
+
+| Node family | Shape excluding rows |
+| --- | ---: |
+| embedding | 800 |
+| cross increments 0/1/2 | 800 each |
+| cross layers 0/1/2 | 800 each |
+| cross branch output | 800 |
+| parallel DNN linears | 256, 128 |
+| parallel DNN branch output | 128 |
+| fusion/final representation | 928 |
+| logit/probability | 1 |
+
+The graph hash was
+`0d4a6561b95fb7ca1f1b05957901b7afa8a403053cabea7093872b15aff440f2`.
+The declared fusion/final alias differed by exactly `0.0`, and the prediction
+from `forward()` differed from representation export by exactly `0.0`.
 
 ## Claim Boundary
 
