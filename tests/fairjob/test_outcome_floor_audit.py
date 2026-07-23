@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 
 from fuxictr_ext.fairjob.outcome_floor_audit import (
+    _ranking_diagnostics,
     calibration_curve,
     classify_dp_floor,
     context_conditioned_dp,
@@ -46,6 +47,25 @@ def test_calibration_curve_preserves_rows_and_bin_means():
     assert sum(row["n"] for row in curve) == len(frame)
     assert np.isclose(curve[0]["prediction_mean"], 0.1)
     assert np.isclose(curve[1]["positive_rate"], 0.5)
+
+
+def test_ranking_diagnostics_reports_mixed_impression_gap():
+    frame = pd.DataFrame(
+        {
+            "impression_id": [1, 1, 1, 1, 2, 2],
+            "protected_attribute": [0, 0, 1, 1, 0, 0],
+            "displayrandom": [1, 1, 1, 1, 1, 1],
+            "y_pred": [0.1, 0.2, 0.8, 0.9, 0.2, 0.7],
+            "click": [0, 1, 0, 1, 0, 1],
+        }
+    )
+    result = _ranking_diagnostics(frame)
+    assert result["mixed_proxy_impressions"] == 1
+    assert (
+        result["within_impression_proxy_rank_gap"]["status"]
+        == "available_limited_support"
+    )
+    assert result["within_impression_proxy_rank_gap"]["signed_gap"] > 0
 
 
 def test_dp_floor_classification_uses_seed_noise_and_bootstrap_zero_crossing():

@@ -12,7 +12,7 @@ import pandas as pd
 from scipy.stats import ks_2samp, wasserstein_distance
 
 from fuxictr_ext.fairjob.build_m5_report import METHODS, POSITION_STATUS, SEEDS
-from fuxictr_ext.fairjob.metrics import utility
+from fuxictr_ext.fairjob.metrics import add_prediction_rank, utility
 from fuxictr_ext.fairjob.prediction_io import check_prediction_alignment, read_meta
 from fuxictr_ext.fairjob.run_manifest import write_run_manifest
 
@@ -147,6 +147,55 @@ def _score_distance(frame: pd.DataFrame) -> dict:
     }
 
 
+def _ranking_diagnostics(frame: pd.DataFrame) -> dict:
+    """Measure ranking gaps while exposing the available cross-group support."""
+
+    random_display = frame[frame["displayrandom"].astype(int) == 1].copy()
+    proxy_counts = random_display.groupby("impression_id")[
+        "protected_attribute"
+    ].nunique()
+    mixed_ids = proxy_counts[proxy_counts > 1].index
+    ranked = add_prediction_rank(random_display)
+    impression_size = ranked.groupby("impression_id")["y_pred"].transform("size")
+    ranked["normalized_pred_rank"] = ranked["pred_rank"] / impression_size
+    mixed = ranked[ranked["impression_id"].isin(mixed_ids)]
+    if mixed.empty:
+        within_impression = {
+            "status": "not_identifiable_no_mixed_impressions",
+            "metric": "mean_normalized_pred_rank_group_1_minus_group_0",
+            "signed_gap": None,
+            "gap_std": None,
+        }
+    else:
+        means = mixed.groupby(
+            ["impression_id", "protected_attribute"]
+        )["normalized_pred_rank"].mean().unstack()
+        gaps = means[1] - means[0]
+        within_impression = {
+            "status": "available_limited_support",
+            "metric": "mean_normalized_pred_rank_group_1_minus_group_0",
+            "signed_gap": float(gaps.mean()),
+            "gap_std": float(gaps.std(ddof=1)) if len(gaps) > 1 else 0.0,
+        }
+    group_utility = {
+        str(group): utility(
+            frame[frame["protected_attribute"].astype(int) == group]
+        )
+        for group in (0, 1)
+    }
+    return {
+        "random_display_impressions": int(
+            random_display["impression_id"].nunique()
+        ),
+        "mixed_proxy_impressions": int(len(mixed_ids)),
+        "within_impression_proxy_rank_gap": within_impression,
+        "group_stratified_U": group_utility,
+        "group_stratified_U_signed_gap": float(
+            group_utility["1"] - group_utility["0"]
+        ),
+    }
+
+
 def prediction_diagnostics(
     payload: dict, meta: pd.DataFrame, calibration_bins: int
 ) -> dict:
@@ -164,19 +213,6 @@ def prediction_diagnostics(
     frame["click"] = frame["click"].to_numpy(dtype=float)
     random_display = frame[frame["displayrandom"].astype(int) == 1].copy()
 
-    # The proxy is normally constant within an impression. Report whether a
-    # literal within-impression cross-group comparison is identifiable before
-    # falling back to group-stratified per-impression utility.
-    proxy_counts = random_display.groupby("impression_id")[
-        "protected_attribute"
-    ].nunique()
-    mixed_impressions = int((proxy_counts > 1).sum())
-    group_utility = {
-        str(group): utility(
-            frame[frame["protected_attribute"].astype(int) == group]
-        )
-        for group in (0, 1)
-    }
     return {
         "alignment": alignment,
         "score_distance": {
@@ -198,19 +234,7 @@ def prediction_diagnostics(
                 ("random_display", random_display),
             )
         },
-        "ranking": {
-            "random_display_impressions": int(
-                random_display["impression_id"].nunique()
-            ),
-            "mixed_proxy_impressions": mixed_impressions,
-            "literal_within_impression_proxy_gap": (
-                "available" if mixed_impressions else "not_identifiable_no_mixed_impressions"
-            ),
-            "group_stratified_U": group_utility,
-            "group_stratified_U_signed_gap": float(
-                group_utility["1"] - group_utility["0"]
-            ),
-        },
+        "ranking": _ranking_diagnostics(frame),
     }
 
 
@@ -349,6 +373,12 @@ def _aggregate_method(runs: list[dict]) -> dict:
                 run["prediction_diagnostics"]["ranking"][
                     "group_stratified_U_signed_gap"
                 ]
+                for run in selected
+            ),
+            "within_impression_rank_gap": _mean_std(
+                run["prediction_diagnostics"]["ranking"][
+                    "within_impression_proxy_rank_gap"
+                ]["signed_gap"]
                 for run in selected
             ),
             "mixed_proxy_impressions": sorted(
@@ -573,8 +603,8 @@ def render_report(audit: dict) -> str:
             "",
             "## Distribution and ranking",
             "",
-            "| Method | All Wasserstein / std | All KS | Random Wasserstein / std | Random KS | U | U_TILDE | Group-stratified U gap |",
-            "|---|---:|---:|---:|---:|---:|---:|---:|",
+            "| Method | All Wasserstein / std | All KS | Random Wasserstein / std | Random KS | U | U_TILDE | Within-impression rank gap | Group-stratified U gap |",
+            "|---|---:|---:|---:|---:|---:|---:|---:|---:|",
         ]
     )
     for method in METHODS:
@@ -589,6 +619,7 @@ def render_report(audit: dict) -> str:
             f"{distance['random_display']['ks_statistic']['mean']:.6f} | "
             f"{utility_values['U']['mean']:.6f} | "
             f"{utility_values['U_TILDE']['mean']:.6f} | "
+            f"{values['within_impression_rank_gap']['mean']:.6f} | "
             f"{values['group_stratified_U_gap']['mean']:.6f} |"
         )
     mixed = sorted(
@@ -601,10 +632,11 @@ def render_report(audit: dict) -> str:
     lines.extend(
         [
             "",
-            f"Mixed-proxy random-display impressions observed: `{mixed}`. "
-            "When this is zero, a literal within-impression protected-group "
-            "ranking contrast is not identifiable; the reported fallback is "
-            "the difference in per-impression U across proxy-group strata.",
+            f"Mixed-proxy random-display impressions observed: `{mixed}`. The "
+            "within-impression value is the mean group-1 minus group-0 "
+            "normalized predicted-rank gap on these candidate sets. With only "
+            "78 mixed impressions, it is exploratory; group-stratified U is "
+            "reported as a broader ranking-quality diagnostic.",
             "",
             "## Bootstrap and proxy sensitivity",
             "",
