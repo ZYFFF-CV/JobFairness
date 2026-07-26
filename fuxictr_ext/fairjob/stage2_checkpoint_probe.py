@@ -359,7 +359,7 @@ def load_resume_payload(path: str | Path, identity: dict) -> dict:
     return payload
 
 
-def _load_model_and_data(args, hparams: dict):
+def load_model_and_data(args, hparams: dict):
     """Rebuild the exact P2 model/data stack and load its best checkpoint."""
 
     params = load_config(args.config_dir, args.expid)
@@ -419,7 +419,7 @@ def execute(args: argparse.Namespace) -> dict:
     plan = build_target_plan(graph, protocol)
     required_names = required_representation_names(plan)
 
-    model, params, checkpoint, generators = _load_model_and_data(args, hparams)
+    model, params, checkpoint, generators = load_model_and_data(args, hparams)
     reference_prediction = Path(
         args.reference_prediction
         or run_dir / "predictions" / f"{args.expid}.csv"

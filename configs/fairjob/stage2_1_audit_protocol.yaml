@@ -1,0 +1,138 @@
+version: 1
+stage: S21-M0
+status: frozen_before_confirmatory_probe_read
+research_scope: representation_graph_behavioral_proxy_redistribution
+
+frozen_provenance:
+  stage2_training_commit: 7574ed45fcacc41dba046e10f962de8472ca500f
+  stage2_decision_commit: 0cc94639cdfba1546f257af3e0f14abcf181cfcf
+  stage2_1_source_protocol_sha256: 25f317f09d5eb5740743885a2f68bc7e21556ca8b33af36e926e65c6286c428b
+
+seed_roles:
+  discovery: [2019]
+  internal_confirmatory: [2020, 2021]
+
+methods:
+  baseline: baseline
+  primary: multi_layer_path_gate_full
+  tier2_controls:
+    - multi_layer_no_gate
+    - full_without_joint_adversary
+    - structured_random_gate
+    - matched_capacity_regularization
+  excluded_collapsed_controls:
+    - layer_risk_sum
+    - final_only_path_gate
+    - final_only_no_gate
+
+paths:
+  graph: configs/fairjob/stage2_representation_graph.yaml
+  probe_protocol: configs/fairjob/stage2_probe_protocol.yaml
+  row_disjoint_sample: /root/autodl-tmp/workdirs/JobFairness/stage1_1/probes/probe_rows.npz
+  user_disjoint_sample: /root/autodl-tmp/workdirs/JobFairness/stage2/manifests/user_disjoint_probe_rows.npz
+  pilot_workdir: /root/autodl-tmp/workdirs/JobFairness/stage2/pilot
+  stage2_1_workdir: /root/autodl-tmp/workdirs/JobFairness/stage2_1
+  runtime_config: /root/autodl-tmp/workdirs/JobFairness/stage1_1/runtime_config
+
+material_delta: 0.005
+
+audit_targets:
+  nodes:
+    - embedding_flat
+    - cross_increment_0
+    - cross_layer_0
+    - cross_increment_1
+    - cross_layer_1
+    - cross_increment_2
+    - cross_layer_2
+    - cross_path_output
+    - parallel_dnn_linear_0
+    - parallel_dnn_linear_1
+    - parallel_dnn_path_output
+    - fusion_pre_logit
+    - dcnv2_final
+    - dcnv2_logit
+    - dcnv2_probability
+  joint_paths:
+    - cross_dnn_outputs
+    - cross_block_increments
+    - branch_outputs_with_fusion
+  local_reduction_targets:
+    - parallel_dnn_path_output
+  amplification_targets:
+    - cross_layer_0
+    - cross_layer_1
+    - cross_layer_2
+    - fusion_pre_logit
+    - joint_cross_dnn_outputs
+    - joint_cross_block_increments
+    - joint_branch_outputs_with_fusion
+  sentinel_targets:
+    - embedding_flat
+    - dcnv2_logit
+    - dcnv2_probability
+
+probe_endpoint:
+  primary: maximum_held_out_auc_across_frozen_families
+  capacity_selection: validation_only
+  orientation_selection: validation_only
+  orientation_rule: flip_probability_when_validation_auc_below_0_5
+  conditional_selection: minimum_validation_cross_entropy
+  probability_clip_epsilon: 1.0e-7
+  test_selection: prohibited
+
+fixed_capacity:
+  rule: first_candidate_in_frozen_stage2_grid
+  linear:
+    C: 0.1
+  matched_capacity_nonlinear:
+    hidden_layer_sizes: [64]
+    alpha: 0.0001
+  independent_bounded:
+    max_depth: 6
+
+conditional_pairs:
+  cross_layer_0_given_embedding:
+    parent: [embedding_flat]
+    child: [cross_layer_0]
+  cross_layer_1_given_cross_layer_0:
+    parent: [cross_layer_0]
+    child: [cross_layer_1]
+  cross_layer_2_given_cross_layer_1:
+    parent: [cross_layer_1]
+    child: [cross_layer_2]
+  parallel_dnn_given_embedding:
+    parent: [embedding_flat]
+    child: [parallel_dnn_path_output]
+  fusion_given_branches:
+    parent: [cross_layer_2, parallel_dnn_path_output]
+    child: [fusion_pre_logit]
+
+joint_gain:
+  cross_dnn_outputs:
+    left: [cross_path_output]
+    right: [parallel_dnn_path_output]
+    joint: [cross_path_output, parallel_dnn_path_output]
+
+confirmatory_gate:
+  minimum_common_local_reductions: 1
+  minimum_common_material_amplifications: 2
+  minimum_common_user_joint_amplifications: 1
+  auc_delta_collapse_min: -0.01
+  replication_labels:
+    - replicated
+    - partially_replicated
+    - not_replicated
+
+storage:
+  mode: in_memory_checkpoint_reconstructable
+  persist_representations: false
+  persisted_artifacts: compact_json_and_markdown_only
+
+claim_boundary:
+  - behavioral_proxy_not_verified_demographic_attribute
+  - probe_family_specific_usable_information_not_mutual_information
+  - internal_confirmation_across_training_seeds_not_new_data_confirmation
+  - descriptive_mechanism_audit_not_causal_fairness
+  - stage2_a_failure_cannot_be_reversed
+  - position_corrected_unavailable_missing_external_propensity
